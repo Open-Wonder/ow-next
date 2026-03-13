@@ -135,15 +135,15 @@ const initialState: ChatState = {
     aspectRatio: '16:9',
     outputType: 'image',
     duration: 5,
-    brandStyle: '',
+    brandStyle: 'style-1',
   },
   productOptions: {
     selectedProducts: [],
-    shotStyle: '',
+    shotStyle: 'pstyle-1',
   },
   characterOptions: {
     selectedCharacters: [],
-    location: '',
+    location: 'cloc-1',
   },
   createOptions: {
     adFormat: '',
