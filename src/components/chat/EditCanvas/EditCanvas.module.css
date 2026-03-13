@@ -12,6 +12,8 @@
 
 .canvasEmbedded .dotGrid {
   background: transparent;
+  /* Keep scroll content readable under floating input dock */
+  padding-bottom: 180px;
 }
 
 .header {

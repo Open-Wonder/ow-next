@@ -183,75 +183,77 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
 
   return (
     <Box variant="white" noPadding className={cn(styles.wrapper, className)}>
-      {/* Input area: inline tags + textarea */}
-      <div className={styles.inputArea}>
-        {inlineTags.length > 0 && (
-          <div className={styles.tagsRow}>
-            {inlineTags.map((tag) => (
-              <span key={tag.id} className={cn(styles.inlineTag, styles[`tag_${tag.category}`])}>
-                {tag.image && (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={tag.image} alt="" className={styles.inlineTagImage} />
-                )}
-                {tag.label}
-                <button className={styles.inlineTagRemove} onClick={tag.onRemove}>
-                  <X size={10} />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-
-        <div className={styles.textRow}>
-          {usePromptEditorFor ? (
-            <PromptEditor
-              ref={promptEditorRef}
-              placeholder={placeholder}
-              onSend={handleSend}
-              onContentChange={setPromptEditorEmpty}
-              content={inImageSessionView && lastUserMessage?.content ? lastUserMessage.content : undefined}
-            />
-          ) : (
-            <textarea
-              ref={textareaRef}
-              className={styles.textarea}
-              placeholder={placeholder}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={1}
-            />
+      <div className={styles.glassLayer}>
+        {/* Input area: inline tags + textarea */}
+        <div className={styles.inputArea}>
+          {inlineTags.length > 0 && (
+            <div className={styles.tagsRow}>
+              {inlineTags.map((tag) => (
+                <span key={tag.id} className={cn(styles.inlineTag, styles[`tag_${tag.category}`])}>
+                  {tag.image && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={tag.image} alt="" className={styles.inlineTagImage} />
+                  )}
+                  {tag.label}
+                  <button className={styles.inlineTagRemove} onClick={tag.onRemove}>
+                    <X size={10} />
+                  </button>
+                </span>
+              ))}
+            </div>
           )}
-          {mode === 'idle' && (
-            <Button
-              variant="primary"
-              size="sm"
-              disabled={!canSend}
-              icon={<ArrowUp size={18} weight="bold" />}
-              className={styles.sendButton}
-              classNames={{ inner: styles.sendButtonInner }}
-              onClick={handleSend}
-            />
-          )}
-        </div>
-      </div>
 
-      {/* Picker bar (mode-specific visual chips; assistant shows empty placeholder for consistent height) */}
-      {mode !== 'idle' && (
-        <div className={styles.pickerBar}>
-          <div className={styles.pickerBarInner}>
-            {mode === 'imagine' && (
-              <ImaginePickers
-                createButton={pickerSendButton}
+          <div className={styles.textRow}>
+            {usePromptEditorFor ? (
+              <PromptEditor
+                ref={promptEditorRef}
+                placeholder={placeholder}
+                onSend={handleSend}
+                onContentChange={setPromptEditorEmpty}
+                content={inImageSessionView && lastUserMessage?.content ? lastUserMessage.content : undefined}
+              />
+            ) : (
+              <textarea
+                ref={textareaRef}
+                className={styles.textarea}
+                placeholder={placeholder}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                rows={1}
               />
             )}
-            {mode === 'product' && <ProductPickers createButton={pickerSendButton} />}
-            {mode === 'character' && <CharacterPickers createButton={pickerSendButton} />}
-            {mode === 'create' && <CreatePickers createButton={pickerSendButton} />}
-            {mode === 'assistant' && <AssistantPickers createButton={pickerSendButton} />}
+            {mode === 'idle' && (
+              <Button
+                variant="primary"
+                size="sm"
+                disabled={!canSend}
+                icon={<ArrowUp size={18} weight="bold" />}
+                className={styles.sendButton}
+                classNames={{ inner: styles.sendButtonInner }}
+                onClick={handleSend}
+              />
+            )}
           </div>
         </div>
-      )}
+
+        {/* Picker bar (mode-specific visual chips; assistant shows empty placeholder for consistent height) */}
+        {mode !== 'idle' && (
+          <div className={styles.pickerBar}>
+            <div className={styles.pickerBarInner}>
+              {mode === 'imagine' && (
+                <ImaginePickers
+                  createButton={pickerSendButton}
+                />
+              )}
+              {mode === 'product' && <ProductPickers createButton={pickerSendButton} />}
+              {mode === 'character' && <CharacterPickers createButton={pickerSendButton} />}
+              {mode === 'create' && <CreatePickers createButton={pickerSendButton} />}
+              {mode === 'assistant' && <AssistantPickers createButton={pickerSendButton} />}
+            </div>
+          </div>
+        )}
+      </div>
     </Box>
   );
 }

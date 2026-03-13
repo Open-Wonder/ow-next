@@ -204,7 +204,17 @@
 }
 
 .inputDockFloating {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
   background: transparent;
+  pointer-events: none;
+}
+
+.inputDockFloating > * {
+  pointer-events: auto;
 }
 
 /* ── History Button (bottom-left, near chat) ────────────────────── */

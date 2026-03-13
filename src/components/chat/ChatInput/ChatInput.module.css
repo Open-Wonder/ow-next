@@ -3,11 +3,44 @@
 .wrapper {
   width: 100%;
   max-width: 960px;
-  overflow: visible;
+  overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
-  border-radius: inherit;
+  border-radius: var(--radius);
+  background: transparent !important;
+}
+
+.wrapper::after {
+  /* Disable Box masked outline layer (causes white corner artifacts here) */
+  display: none;
+}
+
+.glassLayer {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.74);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+.glassLayer::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  border: 1.5px solid transparent;
+  --bg-size: calc(100% + 3px);
+  --alpha: 0;
+  background: linear-gradient(to top, #c9c9c9, #d9d9d94d) center center / var(--bg-size) var(--bg-size);
+  -webkit-mask: linear-gradient(hsl(0 0% 100% / var(--alpha)), hsl(0 0% 100% / var(--alpha))), linear-gradient(hsl(0 0% 100%), hsl(0 0% 100%));
+  mask: linear-gradient(hsl(0 0% 100% / var(--alpha)), hsl(0 0% 100% / var(--alpha))), linear-gradient(hsl(0 0% 100%), hsl(0 0% 100%));
+  -webkit-mask-clip: padding-box, border-box;
+  mask-clip: padding-box, border-box;
+  -webkit-mask-composite: source-in, xor;
+  mask-composite: intersect;
 }
 
 /* ── Mode Pill ──────────────────────────────────────────────────── */
