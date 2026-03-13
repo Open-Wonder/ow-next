@@ -1,10 +1,21 @@
 // ── Brands ──────────────────────────────────────────────────────────
 export const MOCK_BRANDS = [
   {
+    id: 'brand-poolar',
+    name: 'Poolar',
+    initials: 'PO',
+    color: '#ff6b35',
+    organization: 'Poolar',
+    logoUrl: '/poolar-icon.png',
+    description: 'Creative brand.',
+    hasAssistant: true,
+  },
+  {
     id: 'brand-1',
     name: 'Acme Studio',
     initials: 'AS',
     color: '#6466ff',
+    organization: 'Acme Studio',
     description: 'Creative agency pushing boundaries in visual design.',
     hasAssistant: true,
   },
@@ -13,6 +24,7 @@ export const MOCK_BRANDS = [
     name: 'Nova Labs',
     initials: 'NL',
     color: '#24ff78',
+    organization: 'Nova Labs',
     description: 'Tech startup focused on AI-driven solutions.',
     hasAssistant: false,
   },

@@ -134,23 +134,23 @@
 }
 
 .tag_product {
-  background: rgba(230, 126, 34, 0.12);
-  color: #b85a0a;
+  background: var(--color-gray-200);
+  color: var(--color-black);
 }
 
 .tag_character {
-  background: rgba(46, 204, 113, 0.12);
-  color: #1a8a4a;
+  background: var(--color-gray-200);
+  color: var(--color-black);
 }
 
 .tag_style {
-  background: rgba(var(--color-purplish-blue-rgb), 0.1);
-  color: var(--color-purplish-blue);
+  background: var(--color-gray-200);
+  color: var(--color-black);
 }
 
 .tag_format {
-  background: rgba(231, 76, 60, 0.12);
-  color: #c0392b;
+  background: var(--color-gray-200);
+  color: var(--color-black);
 }
 
 .inlineTagImage {

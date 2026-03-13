@@ -147,7 +147,9 @@ export default function HistorySidebar() {
 
       {showHistory && (
         <div className={styles.list}>
-          <h3 className={styles.listHeading}>Creation History</h3>
+          <h3 className={styles.listHeading}>
+            {state.mode === 'assistant' ? 'Chat History' : 'Creation History'}
+          </h3>
           {filteredSessions.length === 0 ? (
             <p className={styles.empty}>{emptyMessage}</p>
           ) : (

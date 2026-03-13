@@ -3,7 +3,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 500;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,8 +14,9 @@
 .backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   cursor: pointer;
 }
 
@@ -52,18 +53,19 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
   cursor: default;
 }
 
 .contentArea {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 80vw;
-  max-height: 70vh;
+  max-width: 90vw;
+  max-height: 90vh;
 }
 
 /* ── Asset (image/video) ───────────────────────────────────────────────── */
@@ -72,14 +74,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 80vw;
-  max-height: 70vh;
+  max-width: 85vw;
+  max-height: calc(90vh - 80px); /* Reserve space for buttons + 20px gap */
 }
 
 .assetImage,
 .assetVideo {
-  max-width: 80vw;
-  max-height: 70vh;
+  max-width: 85vw;
+  max-height: calc(90vh - 80px);
   object-fit: contain;
   border-radius: var(--radius-sm);
   pointer-events: auto;
@@ -119,24 +121,36 @@
   right: var(--spacing-xs);
 }
 
-/* ── Counter ──────────────────────────────────────────────────────────── */
-
-.counter {
-  margin-top: var(--spacing-xs);
-  font-size: var(--font-size-xs);
-  color: var(--color-white);
-  text-align: center;
-}
-
-/* ── Bottom Action Bar ─────────────────────────────────────────────────── */
+/* ── Action Bar (below image, centered, 20px gap) ───────────────────────── */
 
 .actionBar {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-xs);
-  margin-top: var(--spacing-md);
-  padding: var(--spacing-xs) 0;
+  gap: var(--spacing-sm);
+  margin-top: 20px;
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-md);
+  color: var(--color-gray-800);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.actionBtn:hover {
+  background: var(--color-white);
+  color: var(--color-black);
 }
 
 /* ── Modify Panel ─────────────────────────────────────────────────────── */
@@ -153,61 +167,50 @@
   bottom: calc(var(--spacing-md) + 60px);
   left: 50%;
   transform: translateX(-50%);
-  width: 380px;
-  padding: 12px;
+  min-width: 280px;
+  max-width: 400px;
+  padding: 6px 8px;
   background: var(--color-white);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-}
-
-.modifyTitle {
-  font-size: var(--font-size-xs);
-  color: var(--color-gray-500);
-  margin-bottom: var(--spacing-xs);
-  font-weight: var(--font-weight-medium);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-gray-200);
 }
 
 .modifyForm {
   display: flex;
-  gap: var(--spacing-xs);
+  gap: 6px;
   align-items: center;
 }
 
 .modifyInput {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid var(--color-gray-200);
+  border: none;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   font-family: var(--font-family-default);
+  background: var(--color-gray-50);
   outline: none;
-  transition: border-color var(--transition-fast);
+  transition: background var(--transition-fast);
+}
+
+.modifyInput::placeholder {
+  color: var(--color-gray-400);
 }
 
 .modifyInput:focus {
-  border-color: var(--color-gray-400);
+  background: var(--color-gray-100);
 }
 
+/* Matches ChatInput sendButton – 40x40 icon-only primary */
 .modifySendBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
+}
+
+.modifySendBtnInner {
+  width: 100%;
+  height: 100%;
   padding: 0;
-  background: var(--color-black);
-  color: var(--color-white);
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: opacity var(--transition-fast);
-}
-
-.modifySendBtn:hover {
-  opacity: 0.9;
-}
-
-.modifySendBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  justify-content: center;
 }

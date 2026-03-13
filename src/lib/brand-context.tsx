@@ -10,6 +10,7 @@ export interface Brand {
   name: string;
   initials: string;
   color: string;
+  logoUrl?: string;
   description?: string;
   hasAssistant?: boolean;
 }

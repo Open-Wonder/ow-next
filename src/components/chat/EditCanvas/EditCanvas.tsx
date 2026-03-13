@@ -2,11 +2,13 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
-import { X, DownloadSimple, PencilSimple, PaperPlaneRight, Heart } from '@phosphor-icons/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CaretLeft, PaperPlaneRight, Heart } from '@phosphor-icons/react';
+import cn from 'classnames';
 import { Button } from '@/components/common/Button';
 import { useChat } from '@/lib/chat-context';
 import { MOCK_FOLDERS } from '@/lib/mock-data';
+import AssetLightbox from '@/components/chat/AssetLightbox';
 import GenerationLoader from './GenerationLoader';
 import styles from './EditCanvas.module.css';
 
@@ -21,6 +23,7 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
   const [modifyAnchor, setModifyAnchor] = useState<{ top: number; left: number } | null>(null);
   const modifyPopoverRef = useRef<HTMLDivElement>(null);
   const firstAssetThumbRef = useRef<HTMLDivElement>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   /** Convert aspect ratio string like "16:9" to CSS value like "16/9" */
   const getAspectCss = (ratio?: string) => {
@@ -50,6 +53,20 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
     [dispatch, state.currentSession]
   );
 
+  const handleToggleSave = useCallback(
+    (assetId: string, savedToLibrary: boolean) => {
+      if (savedToLibrary) {
+        dispatch({ type: 'UNSAVE_ASSET', payload: assetId });
+      } else {
+        dispatch({
+          type: 'SAVE_ASSET_TO_LIBRARY',
+          payload: { assetId, folderId: MOCK_FOLDERS[0].id },
+        });
+      }
+    },
+    [dispatch]
+  );
+
   const handleSaveToLibrary = useCallback(
     (assetId: string) => {
       dispatch({
@@ -66,13 +83,6 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
     link.download = `asset-${asset.id}`;
     link.click();
   }, []);
-
-  const openModifyPopover = (asset: { id: string; prompt: string }, e: React.MouseEvent) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setModifyAssetId(asset.id);
-    setModifyPrompt(asset.prompt);
-    setModifyAnchor({ top: rect.bottom + 6, left: rect.left });
-  };
 
   useEffect(() => {
     if (!modifyAssetId) return;
@@ -128,23 +138,22 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
   return (
     <motion.div
       className={embedded ? `${styles.canvas} ${styles.canvasEmbedded}` : styles.canvas}
-      initial={{ opacity: 0, x: 40 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 40 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
     >
       <div className={styles.header}>
-        <h3 className={styles.title}>Imagine Session</h3>
-        <span className={styles.headerSpacer} />
         <Button
           variant="secondary"
           size="sm"
-          icon={<X size={14} />}
+          icon={<CaretLeft size={18} weight="bold" />}
           onClick={() => dispatch({ type: 'EXIT_MODE' })}
           aria-label="Close and return to start"
-        >
-          Close
-        </Button>
+          className={styles.backButton}
+        />
+        <h3 className={styles.title}>Image Session</h3>
+        <span className={styles.headerSpacer} />
       </div>
 
       <div
@@ -174,54 +183,36 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={asset.url} alt={asset.prompt} className={styles.thumbImage} />
-                <div className={styles.thumbOverlay}>
-                  <div className={styles.actionBar}>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      icon={<DownloadSimple size={14} />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload(asset);
-                      }}
-                    >
-                      Download
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      icon={
-                        <Heart
-                          size={14}
-                          weight={asset.savedToLibrary ? 'fill' : 'regular'}
-                        />
-                      }
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSaveToLibrary(asset.id);
-                      }}
-                    >
-                      {asset.savedToLibrary ? 'Saved' : 'Save to Library'}
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      icon={<PencilSimple size={14} />}
-                      data-modify-trigger
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openModifyPopover(asset, e);
-                      }}
-                    >
-                      Modify
-                    </Button>
-                  </div>
-                </div>
                 {asset.savedToLibrary && (
-                  <span className={styles.savedBadge} aria-label="Saved to library">
-                    <Heart size={16} weight={asset.savedToLibrary ? 'fill' : 'regular'} />
+                  <span className={styles.savedHeartOnly} aria-hidden>
+                    <Heart size={14} weight="fill" />
                   </span>
                 )}
+                <div
+                  className={styles.thumbOverlay}
+                  onClick={() => setLightboxIndex(i)}
+                  onKeyDown={(e) => e.key === 'Enter' && setLightboxIndex(i)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="View full size"
+                >
+                  <button
+                    type="button"
+                    className={cn(styles.heartButton, asset.savedToLibrary && styles.heartButtonLiked)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleSave(asset.id, asset.savedToLibrary);
+                    }}
+                    aria-label={
+                      asset.savedToLibrary ? 'Remove from library' : 'Save to library'
+                    }
+                  >
+                    <Heart
+                      size={14}
+                      weight={asset.savedToLibrary ? 'fill' : 'regular'}
+                    />
+                  </button>
+                </div>
               </motion.div>
             ))}
             {isGenerating &&
@@ -282,6 +273,23 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
               </button>
             </div>
           </motion.div>,
+          document.body
+        )}
+
+      {/* Lightbox overlay - portaled to body so it appears above everything */}
+      {typeof document !== 'undefined' &&
+        lightboxIndex !== null &&
+        assets.length > 0 &&
+        createPortal(
+          <AnimatePresence>
+            <AssetLightbox
+              assets={assets}
+              initialIndex={lightboxIndex}
+              onClose={() => setLightboxIndex(null)}
+              onModify={handleModify}
+              onSaveToLibrary={handleSaveToLibrary}
+            />
+          </AnimatePresence>,
           document.body
         )}
     </motion.div>

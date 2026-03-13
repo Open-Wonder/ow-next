@@ -4,6 +4,7 @@ import { useCallback, useEffect, useImperativeHandle, useRef, forwardRef } from 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import { MOCK_PRODUCTS, MOCK_CHARACTERS } from '@/lib/mock-data';
 import { ProductTag } from './extensions/ProductTag';
 import { CharacterTag } from './extensions/CharacterTag';
 import { MentionSuggestion, MentionSuggestionPluginKey } from './extensions/MentionSuggestion';
@@ -137,7 +138,11 @@ const PromptEditor = forwardRef<PromptEditorRef, PromptEditorProps>(function Pro
 
   useEffect(() => {
     if (editor && initialContentRef.current) {
-      const content = parseContentToJSON(initialContentRef.current);
+      const content = parseContentToJSON(
+        initialContentRef.current,
+        MOCK_PRODUCTS,
+        MOCK_CHARACTERS
+      );
       editor.commands.setContent({ type: 'doc', content: [{ type: 'paragraph', content }] });
     }
   }, [editor]);
@@ -202,7 +207,7 @@ const PromptEditor = forwardRef<PromptEditorRef, PromptEditorProps>(function Pro
         editor.commands.clearContent();
         return;
       }
-      const content = parseContentToJSON(text);
+      const content = parseContentToJSON(text, MOCK_PRODUCTS, MOCK_CHARACTERS);
       editor.commands.setContent({ type: 'doc', content: [{ type: 'paragraph', content }] });
     },
     [editor]

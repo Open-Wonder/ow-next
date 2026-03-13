@@ -112,6 +112,7 @@ type ChatAction =
   | { type: 'ADD_ASSISTANT_MESSAGE'; payload: ChatMessage }
   | { type: 'ADD_GENERATED_ASSET'; payload: GeneratedAsset }
   | { type: 'SAVE_ASSET_TO_LIBRARY'; payload: { assetId: string; folderId: string } }
+  | { type: 'UNSAVE_ASSET'; payload: string }
   | { type: 'REMOVE_ASSET_FROM_FOLDER'; payload: { assetId: string; folderId: string } }
   | { type: 'DELETE_ASSET'; payload: string }
   | { type: 'SET_CANVAS_OPEN'; payload: boolean }
@@ -359,6 +360,23 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       };
     }
 
+    case 'UNSAVE_ASSET': {
+      if (!state.currentSession) return state;
+      const assetId = action.payload;
+      const updatedAssets = state.currentSession.generatedAssets.map((a) =>
+        a.id === assetId ? { ...a, savedToLibrary: false, folderIds: [] } : a
+      );
+      const updatedSession = { ...state.currentSession, generatedAssets: updatedAssets };
+      const updatedSessions = state.sessions.map((s) =>
+        s.id === updatedSession.id ? updatedSession : s
+      );
+      return {
+        ...state,
+        currentSession: updatedSession,
+        sessions: updatedSessions,
+      };
+    }
+
     case 'REMOVE_ASSET_FROM_FOLDER': {
       if (!state.currentSession) return state;
       const { assetId, folderId } = action.payload;
@@ -545,38 +563,121 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         const sessions = JSON.parse(raw) as ChatSession[];
         dispatch({ type: 'LOAD_SESSIONS', payload: sessions });
       } else {
-        const exampleSessions: ChatSession[] = [
-          {
-            id: 'session-example-1',
-            title: 'A woman holding a baby standing inside a kitchen',
-            mode: 'imagine',
-            messages: [],
-            generatedAssets: [],
-            createdAt: new Date(Date.now() - 2 * 3600000).toISOString(),
-            styleId: 'style-1',
-            aspectRatio: '16:9',
-          },
-          {
-            id: 'session-example-2',
-            title: 'Minimalist product shot on marble surface',
-            mode: 'imagine',
-            messages: [],
-            generatedAssets: [],
-            createdAt: new Date(Date.now() - 5 * 3600000).toISOString(),
-            styleId: 'style-2',
-            aspectRatio: '1:1',
-          },
-          {
-            id: 'session-example-3',
-            title: 'Cozy interior with warm lighting and plants',
-            mode: 'imagine',
-            messages: [],
-            generatedAssets: [],
-            createdAt: new Date(Date.now() - 24 * 3600000).toISOString(),
-            styleId: 'style-1',
-            aspectRatio: '4:5',
-          },
+        const IMAGINE_TITLES = [
+          'A woman holding a baby standing inside a kitchen',
+          'Minimalist product shot on marble surface',
+          'Cozy interior with warm lighting and plants',
+          'Futuristic cityscape at sunset with neon lights',
+          'Abstract geometric patterns in purple and gold',
+          'Portrait of a character in retro-futuristic style',
+          'Aerial view of a tropical island with turquoise water',
+          'Organic shapes flowing like liquid metal',
+          'Dramatic mountain landscape with storm clouds',
+          'Fashion editorial with vibrant color blocking',
+          'Underwater scene with bioluminescent creatures',
+          'Urban street photography in black and white',
+          'Surreal floating objects in a dream-like space',
+          'Vintage car on a coastal road at golden hour',
+          'Minimalist Scandinavian living room design',
         ];
+        const PRODUCT_TITLES = [
+          'Wireless headphones on gradient background',
+          'Skincare bottle with botanical elements',
+          'Sneakers on reflective surface',
+          'Coffee bag with minimalist typography',
+          'Smartwatch lifestyle shot outdoors',
+          'Perfume bottle with soft shadows',
+          'Laptop with productivity setup',
+          'Water bottle in gym environment',
+          'Watch on wooden texture',
+          'Headphones floating in dark space',
+          'Cosmetic compact with mirror reflection',
+          'Sunglasses on beach sand',
+          'Backpack in urban setting',
+          'Bottle of craft beer with hops',
+          'Smartphone with app interface',
+        ];
+        const CHARACTER_TITLES = [
+          'Sarah in a modern office environment',
+          'Marcus at a coffee shop with laptop',
+          'Elena in a garden with flowers',
+          'Karen in professional headshot style',
+          'Michael in casual outdoor setting',
+          'James in studio portrait lighting',
+          'Testimonial scene with product',
+          'Character in kitchen cooking',
+          'Portrait with soft natural light',
+          'Group of friends at a cafe',
+          'Business professional in meeting',
+          'Creative in art studio',
+          'Athlete in motion outdoors',
+          'Chef in restaurant kitchen',
+          'Designer at drafting table',
+        ];
+        const CREATE_TITLES = [
+          'Instagram story ad for summer campaign',
+          'Facebook feed post with CTA',
+          'LinkedIn banner for B2B',
+          'YouTube thumbnail with bold text',
+          'Pinterest pin for recipe',
+          'Twitter card for product launch',
+          'TikTok style vertical ad',
+          'Newsletter header design',
+          'Email signature banner',
+          'Web banner 728x90',
+          'Display ad 300x250',
+          'Carousel ad first slide',
+          'Stories format with swipe up',
+          'Reels style short video',
+          'Podcast cover art design',
+        ];
+        const ASSISTANT_TITLES = [
+          'What are our brand guidelines for imagery?',
+          'Help me understand the tone of voice',
+          'Which colors can I use for campaigns?',
+          'Summarize our content strategy',
+          'What fonts are approved for headlines?',
+          'Explain our target audience',
+          'Brand voice for social media',
+          'Guidelines for product photography',
+          'How to use our logo correctly',
+          'Content calendar best practices',
+          'Competitor analysis request',
+          'Campaign performance metrics',
+          'Asset organization tips',
+          'Creative brief template',
+          'Brand consistency checklist',
+        ];
+        const modes: CreativeMode[] = ['imagine', 'product', 'character', 'create', 'assistant'];
+        const titlesByMode: Record<CreativeMode, string[]> = {
+          imagine: IMAGINE_TITLES,
+          product: PRODUCT_TITLES,
+          character: CHARACTER_TITLES,
+          create: CREATE_TITLES,
+          assistant: ASSISTANT_TITLES,
+          idle: [],
+        };
+        const styleIds = ['style-1', 'style-2', 'style-3', 'style-4'];
+        const aspectRatios = ['16:9', '1:1', '4:5'] as const;
+        const exampleSessions: ChatSession[] = [];
+        let sessionIdx = 0;
+        for (const mode of modes) {
+          const titles = titlesByMode[mode];
+          for (let i = 0; i < titles.length; i++) {
+            const styleId = mode === 'product' ? 'pstyle-1' : styleIds[i % styleIds.length];
+            exampleSessions.push({
+              id: `session-example-${sessionIdx + 1}`,
+              title: titles[i],
+              mode,
+              messages: [],
+              generatedAssets: [],
+              createdAt: new Date(Date.now() - (sessionIdx + 1) * 3600000).toISOString(),
+              styleId: mode === 'assistant' ? undefined : styleId,
+              aspectRatio: mode === 'assistant' ? undefined : aspectRatios[i % aspectRatios.length],
+            });
+            sessionIdx++;
+          }
+        }
         dispatch({ type: 'LOAD_SESSIONS', payload: exampleSessions });
       }
     } catch {

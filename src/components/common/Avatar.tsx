@@ -3,7 +3,7 @@ import styles from './Avatar.module.css';
 
 type AvatarProps = {
   name?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 };
 

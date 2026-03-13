@@ -4,9 +4,9 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
+  ArrowUp,
   DownloadSimple,
   PencilSimple,
-  PaperPlaneRight,
 } from '@phosphor-icons/react';
 import { Button } from '@/components/common/Button';
 import styles from './AssetLightbox.module.css';
@@ -179,30 +179,24 @@ export default function AssetLightbox({
               </motion.div>
             </AnimatePresence>
           </div>
-
-        </div>
-
-        <div className={styles.counter}>
-          {currentIndex + 1} of {assets.length}
-        </div>
-
-        <div className={styles.actionBar}>
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={<DownloadSimple size={16} />}
-            onClick={handleDownload}
-          >
-            Download
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={<PencilSimple size={16} />}
-            onClick={handleModifyClick}
-          >
-            Modify
-          </Button>
+          <div className={styles.actionBar}>
+            <button
+              type="button"
+              className={styles.actionBtn}
+              onClick={handleDownload}
+              aria-label="Download"
+            >
+              <DownloadSimple size={20} />
+            </button>
+            <button
+              type="button"
+              className={styles.actionBtn}
+              onClick={handleModifyClick}
+              aria-label="Modify"
+            >
+              <PencilSimple size={20} />
+            </button>
+          </div>
         </div>
 
         {showModifyPanel && (
@@ -214,7 +208,6 @@ export default function AssetLightbox({
               className={styles.modifyPanel}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className={styles.modifyTitle}>Modify this image</div>
               <form
                 className={styles.modifyForm}
                 onSubmit={(e) => {
@@ -228,15 +221,18 @@ export default function AssetLightbox({
                   className={styles.modifyInput}
                   value={modifyInputText}
                   onChange={(e) => setModifyInputText(e.target.value)}
-                  placeholder="Enter new prompt..."
+                  placeholder="Describe changes..."
                 />
-                <button
+                <Button
+                  variant="primary"
+                  size="sm"
                   type="submit"
-                  className={styles.modifySendBtn}
                   disabled={!modifyInputText.trim()}
-                >
-                  <PaperPlaneRight size={18} />
-                </button>
+                  icon={<PaperPlaneRight size={18} weight="bold" />}
+                  className={styles.modifySendBtn}
+                  classNames={{ inner: styles.modifySendBtnInner }}
+                  aria-label="Apply"
+                />
               </form>
             </div>
           </div>

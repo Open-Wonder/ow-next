@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { CreativeMode } from '@/lib/chat-context';
+import { useBrand } from '@/lib/brand-context';
 import styles from './EditCanvas.module.css';
 
 const DOT_SPACING = 20;
@@ -16,28 +17,39 @@ interface Ripple {
   startTime: number;
 }
 
-const MESSAGES: Record<string, string[]> = {
-  imagine: [
-    'Enhancing your prompt',
-    'Bringing your idea to life',
-    'Refining details',
-    'Generating images',
-  ],
-  product: [
-    'Analyzing your prompt',
-    'Applying product style',
-    'Setting up the scene',
-    'Generating images',
-  ],
-  character: [
-    'Analyzing your prompt',
-    'Preparing character reference',
-    'Building the scene',
-    'Generating images',
-  ],
-};
+function getMessages(mode: CreativeMode, brandName: string): string[] {
+  const brand = brandName || 'your brand';
+  const templates: Record<string, string[]> = {
+    imagine: [
+      `Checking the ${brand} imagery style`,
+      `Applying ${brand} content guidelines`,
+      `Matching ${brand} visual identity`,
+      `Generating for ${brand}`,
+    ],
+    product: [
+      `Checking the ${brand} product style`,
+      `Applying ${brand} shot guidelines`,
+      `Setting up ${brand} product scene`,
+      `Generating for ${brand}`,
+    ],
+    character: [
+      `Checking the ${brand} character style`,
+      `Applying ${brand} scene guidelines`,
+      `Building ${brand} character scene`,
+      `Generating for ${brand}`,
+    ],
+    create: [
+      `Checking the ${brand} ad format`,
+      `Applying ${brand} campaign style`,
+      `Matching ${brand} ad guidelines`,
+      `Generating for ${brand}`,
+    ],
+  };
+  return templates[mode] ?? templates.imagine;
+}
 
 export default function GenerationLoader({ mode }: { mode: CreativeMode }) {
+  const { activeBrand } = useBrand();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const ripplesRef = useRef<Ripple[]>([]);
@@ -45,7 +57,10 @@ export default function GenerationLoader({ mode }: { mode: CreativeMode }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [animState, setAnimState] = useState<'entering' | 'visible' | 'exiting'>('entering');
 
-  const messages = MESSAGES[mode] ?? MESSAGES.imagine;
+  const messages = useMemo(
+    () => getMessages(mode, activeBrand?.name ?? 'your brand'),
+    [mode, activeBrand?.name]
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;

@@ -25,6 +25,19 @@
   flex-shrink: 0;
 }
 
+.backButton {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  flex-shrink: 0;
+}
+
+.backButton .inner {
+  padding: 0 !important;
+  width: 100%;
+  height: 100%;
+}
+
 .title {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
@@ -111,9 +124,9 @@
 }
 
 .generationMessage {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
-  color: var(--color-gray-500);
+  color: var(--color-gray-400);
   white-space: nowrap;
   display: block;
   text-align: center;
@@ -147,34 +160,84 @@
   min-height: 0;
 }
 
-.assetThumb:hover {
-  transform: scale(1.02);
-}
-
 .thumbImage {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   background: transparent;
+  transition: transform 150ms ease;
 }
 
-/* ── Hover Overlay ──────────────────────────────────────────────── */
+.assetThumb:hover .thumbImage {
+  transform: scale(1.04);
+}
+
+/* ── Hover Overlay (heart only, top-right) ─────────────────────────────── */
+
+/* Saved state: just the red heart, no button – visible when NOT hovering.
+   Position matches the heart inside the button: button is 28×28 at 6px padding,
+   heart (14×14) is centered → top/right 13px so it aligns when hover reveals button. */
+.savedHeartOnly {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e74c3c;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 150ms ease;
+}
+
+.assetThumb:hover .savedHeartOnly {
+  opacity: 0;
+}
 
 .thumbOverlay {
   position: absolute;
   inset: 0;
   background: transparent;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 6px;
+  cursor: pointer;
   opacity: 0;
   transition: opacity 150ms ease;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: var(--spacing-sm);
 }
 
 .assetThumb:hover .thumbOverlay {
   opacity: 1;
+}
+
+.heartButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  color: var(--color-gray-500);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.heartButton:hover {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.heartButtonLiked {
+  color: #e74c3c;
+}
+
+.heartButtonLiked:hover {
+  color: #c0392b;
 }
 
 .actionBar {
@@ -280,20 +343,3 @@
   }
 }
 
-/* ── Saved Badge (red heart in circle, like library) ───────────────── */
-
-.savedBadge {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(4px);
-  color: #e74c3c;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}

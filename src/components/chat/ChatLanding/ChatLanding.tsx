@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X } from '@phosphor-icons/react';
 import ChatInput from '@/components/chat/ChatInput/ChatInput';
 import ChatMessages from '@/components/chat/ChatMessages/ChatMessages';
@@ -226,108 +226,111 @@ export default function ChatLanding() {
     }, 1200);
   };
 
-  const transition = { duration: 0.45, ease: [0.4, 0, 0.2, 1] as const };
+  const fadeOut = { duration: 0.3, ease: [0.4, 0, 0.2, 1] as const };
+  const fadeIn = { duration: 0.35, ease: [0.4, 0, 0.2, 1] as const };
+  const fadeInDelayed = { duration: 0.35, ease: [0.4, 0, 0.2, 1] as const, delay: 0.5 };
 
   return (
     <div className={styles.viewWrapper}>
-      <LayoutGroup>
-        <div className={styles.animateArea}>
-          <AnimatePresence mode="sync">
-            {hasImageSessionView ? (
+      <div className={styles.animateArea}>
+        <AnimatePresence mode="wait">
+          {hasImageSessionView ? (
+            <motion.div
+              key="activeImagine"
+              className={`${styles.activeChat} ${styles.imagineView}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={fadeOut}
+            >
+              {showFullViewportLoader && (
+                <div className={styles.generationLoaderFullViewport}>
+                  <GenerationLoader mode={state.mode} />
+                </div>
+              )}
               <motion.div
-                key="activeImagine"
-                className={`${styles.activeChat} ${styles.imagineView}`}
+                className={styles.imagineCanvasArea}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={transition}
+                transition={fadeInDelayed}
               >
-                {showFullViewportLoader && (
-                  <div className={styles.generationLoaderFullViewport}>
-                    <GenerationLoader mode={state.mode} />
-                  </div>
-                )}
-                <motion.div
-                  className={styles.imagineCanvasArea}
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ ...transition, delay: 0.05 }}
-                >
-                  <EditCanvas embedded />
-                </motion.div>
-                <motion.div
-                  layoutId="chat-input"
-                  layout
-                  className={`${styles.inputDock} ${styles.inputDockFloating}`}
-                >
-                  <ChatInput onSend={handleSend} />
-                </motion.div>
+                <EditCanvas embedded />
               </motion.div>
-            ) : !hasMessages ? (
+              <div className={`${styles.inputDock} ${styles.inputDockFloating}`}>
+                <ChatInput onSend={handleSend} />
+              </div>
+            </motion.div>
+          ) : !hasMessages ? (
+            <motion.div
+              key="landing"
+              className={styles.landing}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={fadeOut}
+            >
               <motion.div
-                key="landing"
-                className={styles.landing}
+                className={styles.landingHero}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -40 }}
+                transition={fadeIn}
+              >
+                <h1 className={styles.greeting}>{headline.greeting}</h1>
+              </motion.div>
+              <div className={styles.landingInputWrap}>
+                <ChatInput onSend={handleSend} />
+              </div>
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={transition}
+                transition={fadeIn}
               >
-                <motion.div
-                  className={styles.landingHero}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -80 }}
-                  transition={transition}
-                >
-                  <h1 className={styles.greeting}>{headline.greeting}</h1>
-                </motion.div>
-                <motion.div layoutId="chat-input" layout className={styles.landingInputWrap}>
-                  <ChatInput onSend={handleSend} />
-                </motion.div>
                 <ModeBoxes />
               </motion.div>
-            ) : (
+            </motion.div>
+          ) : (
+            <motion.div
+              key="activeChat"
+              className={styles.activeChat}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={fadeOut}
+            >
               <motion.div
-                key="activeChat"
-                className={styles.activeChat}
+                className={styles.chatContent}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={transition}
+                transition={fadeInDelayed}
               >
-                <motion.div
-                  className={styles.chatContent}
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ ...transition, delay: 0.05 }}
-                >
-                  <div className={styles.sessionHeader}>
-                    <span className={styles.sessionTitle}>
-                      {state.currentSession?.title ?? 'Chat'}
-                    </span>
-                    <button
-                      className={styles.newChatButton}
-                      onClick={() => dispatch({ type: 'EXIT_MODE' })}
-                      aria-label="Close chat and return to start"
-                    >
-                      <X size={14} />
-                      Close
-                    </button>
-                  </div>
-                  <ChatSessionHistory />
-                  <ChatMessages
-                    messages={state.currentSession!.messages}
-                    isGenerating={isGenerating}
-                  />
-                </motion.div>
-                <motion.div layoutId="chat-input" layout className={styles.inputDock}>
-                  <ChatInput onSend={handleSend} />
-                </motion.div>
+                <div className={styles.sessionHeader}>
+                  <span className={styles.sessionTitle}>
+                    {state.currentSession?.title ?? 'Chat'}
+                  </span>
+                  <button
+                    className={styles.newChatButton}
+                    onClick={() => dispatch({ type: 'EXIT_MODE' })}
+                    aria-label="Close chat and return to start"
+                  >
+                    <X size={14} />
+                    Close
+                  </button>
+                </div>
+                <ChatSessionHistory />
+                <ChatMessages
+                  messages={state.currentSession!.messages}
+                  isGenerating={isGenerating}
+                />
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </LayoutGroup>
+              <div className={styles.inputDock}>
+                <ChatInput onSend={handleSend} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

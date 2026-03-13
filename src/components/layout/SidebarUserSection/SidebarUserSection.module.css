@@ -27,7 +27,7 @@
 .userInfo {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0;
   min-width: 0;
 }
 
@@ -44,10 +44,10 @@
   font-size: 10px;
   font-weight: var(--font-weight-medium);
   color: var(--color-gray-500);
-  background: var(--color-gray-100);
-  padding: 1px 5px;
-  border-radius: var(--radius-xs);
-  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .userMenu {
@@ -86,7 +86,7 @@
 .menuHeaderInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
   min-width: 0;
 }
 

@@ -97,20 +97,20 @@ export default function SidebarUserSection() {
         className={styles.userTrigger}
         onClick={() => setUserMenuOpen((o) => !o)}
       >
-        <Avatar name={MOCK_USER.name} size="sm" />
+        <Avatar name={MOCK_USER.name} size="xl" />
         <div className={styles.userInfo}>
           <span className={styles.userName}>{MOCK_USER.name}</span>
-          <span className={styles.planTag}>Free Plan</span>
+          <span className={styles.planTag}>{MOCK_USER.email}</span>
         </div>
       </button>
 
       {userMenuOpen && (
         <div className={styles.userMenu}>
           <div className={styles.menuHeader}>
-            <Avatar name={MOCK_USER.name} size="sm" />
+            <Avatar name={MOCK_USER.name} size="xl" />
             <div className={styles.menuHeaderInfo}>
               <span className={styles.menuHeaderName}>{MOCK_USER.name}</span>
-              <span className={styles.planTag}>Free Plan</span>
+              <span className={styles.planTag}>{MOCK_USER.email}</span>
             </div>
           </div>
           {visibleItems.map((item) =>
