@@ -11,7 +11,6 @@ import cn from 'classnames';
 import { useChat } from '@/lib/chat-context';
 import { setMentionMode } from '@/lib/mention-mode';
 import {
-  MOCK_BRAND_STYLES,
   MOCK_IMAGE_STYLES,
   MOCK_PRODUCT_STYLES,
   MOCK_CHARACTER_LOCATIONS,

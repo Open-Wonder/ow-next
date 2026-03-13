@@ -77,13 +77,6 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
     [dispatch]
   );
 
-  const handleDownload = useCallback((asset: { url: string; id: string }) => {
-    const link = document.createElement('a');
-    link.href = asset.url;
-    link.download = `asset-${asset.id}`;
-    link.click();
-  }, []);
-
   useEffect(() => {
     if (!modifyAssetId) return;
     const handleClickOutside = (ev: MouseEvent) => {
@@ -121,7 +114,7 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
       });
     });
     return () => cancelAnimationFrame(raf);
-  }, [state.pendingModifyPrompt, dispatch]);
+  }, [state.pendingModifyPrompt, state.currentSession?.generatedAssets, dispatch]);
 
   const submitModify = () => {
     if (modifyAssetId && modifyPrompt.trim()) {

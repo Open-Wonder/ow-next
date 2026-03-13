@@ -4,9 +4,9 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
-  ArrowUp,
   DownloadSimple,
   PencilSimple,
+  PaperPlaneRight,
 } from '@phosphor-icons/react';
 import { Button } from '@/components/common/Button';
 import styles from './AssetLightbox.module.css';
@@ -43,7 +43,6 @@ export default function AssetLightbox({
   const contentRef = useRef<HTMLDivElement>(null);
 
   const currentAsset = assets[currentIndex];
-  const hasMultiple = assets.length > 1;
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < assets.length - 1;
 

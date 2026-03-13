@@ -26,10 +26,6 @@ import AssetLightbox from '@/components/chat/AssetLightbox/AssetLightbox';
 import { useChat } from '@/lib/chat-context';
 import styles from './LibraryView.module.css';
 
-// ── Types ───────────────────────────────────────────────────────────────
-
-type StyleFilter = string; // style id, or '' for no filter
-
 // ── Component ───────────────────────────────────────────────────────────
 
 export default function LibraryView() {

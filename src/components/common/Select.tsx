@@ -167,7 +167,7 @@ export default function CustomSelect({
       >
         <Combobox.Trigger
           render={(props) => {
-            const { color: _color, ...buttonProps } = props;
+            const { color: _unused, ...buttonProps } = props;
             const displayValue =
               triggerPrefix && selectedOption
                 ? `${triggerPrefix}${selectedOption.label}`
