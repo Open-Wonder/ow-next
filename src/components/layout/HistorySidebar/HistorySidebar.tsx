@@ -178,14 +178,15 @@ export default function HistorySidebar() {
                     )}
                     <span className={styles.sessionTextBlock}>
                       <span className={styles.sessionTitle}>{session.title}</span>
-                        {isGenerating ? (
-                        <span className={styles.generatingIndicator}>
-                          <span className={styles.pulsingDot} aria-hidden />
-                          Generating images...
-                        </span>
-                      ) : (
-                        <span className={styles.sessionMeta}>{meta}</span>
-                      )}
+                      {session.mode !== 'assistant' &&
+                        (isGenerating ? (
+                          <span className={styles.generatingIndicator}>
+                            <span className={styles.pulsingDot} aria-hidden />
+                            Generating images...
+                          </span>
+                        ) : (
+                          <span className={styles.sessionMeta}>{meta}</span>
+                        ))}
                     </span>
                   </button>
                   <button

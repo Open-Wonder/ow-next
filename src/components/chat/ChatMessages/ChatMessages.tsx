@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Robot } from '@phosphor-icons/react';
 import cn from 'classnames';
-import Avatar from '@/components/common/Avatar';
+import Image from 'next/image';
+import { useBrand } from '@/lib/brand-context';
 import { ChatMessage } from '@/lib/chat-context';
-import { MOCK_USER } from '@/lib/mock-data';
 import styles from './ChatMessages.module.css';
 
 interface ChatMessagesProps {
@@ -15,6 +14,7 @@ interface ChatMessagesProps {
 
 export default function ChatMessages({ messages, isGenerating }: ChatMessagesProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { activeBrand } = useBrand();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -30,19 +30,29 @@ export default function ChatMessages({ messages, isGenerating }: ChatMessagesPro
             key={msg.id}
             className={cn(styles.message, msg.role === 'user' ? styles.user : styles.assistant)}
           >
-            <div className={styles.avatar}>
-              {msg.role === 'user' ? (
-                <Avatar name={MOCK_USER.name} size="sm" />
-              ) : (
-                <div className={styles.botAvatar}>
-                  <Robot size={16} />
-                </div>
-              )}
-            </div>
+            {msg.role === 'assistant' && (
+              <div className={styles.avatar}>
+                {activeBrand.logoUrl ? (
+                  <div className={styles.brandAvatar}>
+                    <Image
+                      src={activeBrand.logoUrl}
+                      alt={activeBrand.name}
+                      width={28}
+                      height={28}
+                      className={styles.brandLogo}
+                    />
+                  </div>
+                ) : (
+                  <div className={styles.botAvatar}>
+                    <span className={styles.brandInitials}>{activeBrand.initials}</span>
+                  </div>
+                )}
+              </div>
+            )}
             <div className={styles.bubble}>
-              <span className={styles.sender}>
-                {msg.role === 'user' ? MOCK_USER.name : 'Open Wonder'}
-              </span>
+              {msg.role === 'assistant' && (
+                <span className={styles.sender}>{activeBrand.name}</span>
+              )}
               <div className={styles.content}>
                 {msg.content}
                 {msg.tags && msg.tags.length > 0 && (
@@ -62,12 +72,24 @@ export default function ChatMessages({ messages, isGenerating }: ChatMessagesPro
         {isGenerating && (
           <div className={cn(styles.message, styles.assistant)}>
             <div className={styles.avatar}>
-              <div className={styles.botAvatar}>
-                <Robot size={16} weight="fill" />
-              </div>
+              {activeBrand.logoUrl ? (
+                <div className={styles.brandAvatar}>
+                  <Image
+                    src={activeBrand.logoUrl}
+                    alt={activeBrand.name}
+                    width={28}
+                    height={28}
+                    className={styles.brandLogo}
+                  />
+                </div>
+              ) : (
+                <div className={styles.botAvatar}>
+                  <span className={styles.brandInitials}>{activeBrand.initials}</span>
+                </div>
+              )}
             </div>
             <div className={styles.bubble}>
-              <span className={styles.sender}>Open Wonder</span>
+              <span className={styles.sender}>{activeBrand.name}</span>
               <div className={styles.typing}>
                 <span className={styles.dot} />
                 <span className={styles.dot} />

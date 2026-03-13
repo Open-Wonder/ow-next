@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from '@phosphor-icons/react';
+import { CaretLeft } from '@phosphor-icons/react';
 import ChatInput from '@/components/chat/ChatInput/ChatInput';
+import { Button } from '@/components/common/Button';
 import ChatMessages from '@/components/chat/ChatMessages/ChatMessages';
 import ChatSessionHistory from '@/components/chat/ChatSessionHistory/ChatSessionHistory';
 import EditCanvas from '@/components/chat/EditCanvas/EditCanvas';
@@ -306,17 +307,16 @@ export default function ChatLanding() {
                 transition={fadeInDelayed}
               >
                 <div className={styles.sessionHeader}>
-                  <span className={styles.sessionTitle}>
-                    {state.currentSession?.title ?? 'Chat'}
-                  </span>
-                  <button
-                    className={styles.newChatButton}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<CaretLeft size={18} weight="bold" />}
                     onClick={() => dispatch({ type: 'EXIT_MODE' })}
-                    aria-label="Close chat and return to start"
-                  >
-                    <X size={14} />
-                    Close
-                  </button>
+                    aria-label="Close and return to start"
+                    className={styles.chatBackButton}
+                  />
+                  <h3 className={styles.chatTitle}>Chat-Session</h3>
+                  <span className={styles.headerSpacer} />
                 </div>
                 <ChatSessionHistory />
                 <ChatMessages

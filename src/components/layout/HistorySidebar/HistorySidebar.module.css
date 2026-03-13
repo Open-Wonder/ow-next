@@ -6,7 +6,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--color-white);
+  background: var(--color-gray-50);
 }
 
 .brandSection {
@@ -55,7 +55,7 @@
 }
 
 .sessionItem:hover {
-  background: var(--color-gray-200);
+  background: var(--color-white);
 }
 
 .sessionItemActive {
@@ -208,7 +208,7 @@
 }
 
 .collectionItem:hover {
-  background: var(--color-gray-100);
+  background: var(--color-white);
   color: var(--color-black);
 }
 

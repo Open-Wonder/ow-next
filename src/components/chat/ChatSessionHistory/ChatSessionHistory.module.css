@@ -2,7 +2,6 @@
 
 .container {
   flex-shrink: 0;
-  border-bottom: var(--border-default);
   background: var(--color-white);
 }
 
