@@ -57,7 +57,7 @@
 
 .greeting {
   font-family: var(--font-family-brand);
-  font-size: 28px;
+  font-size: 26px;
   font-weight: var(--font-weight-semibold);
   color: var(--color-black);
   text-align: center;
@@ -125,14 +125,26 @@
   overflow: hidden;
 }
 
-/* Dotted grid fills entire imagine view, behind canvas and input */
+/* Dotted grid fills entire imagine view, fades out towards edges */
 .imagineView::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image: radial-gradient(circle, var(--color-gray-300) 1px, transparent 1px);
   background-size: 20px 20px;
-  background-color: var(--color-gray-50);
+  background-color: transparent;
+  mask-image: radial-gradient(
+    ellipse 100% 80% at 50% 50%,
+    black 0%,
+    black 35%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 80% at 50% 50%,
+    black 0%,
+    black 35%,
+    transparent 100%
+  );
   z-index: 0;
   pointer-events: none;
 }
@@ -215,36 +227,4 @@
 
 .inputDockFloating > * {
   pointer-events: auto;
-}
-
-/* ── History Button (bottom-left, near chat) ────────────────────── */
-
-.historyDock {
-  position: fixed;
-  bottom: var(--spacing-md);
-  left: var(--spacing-md);
-  z-index: 50;
-}
-
-.historyButton {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: var(--radius-full);
-  background: var(--color-white);
-  color: var(--color-gray-600);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  border: var(--border-default);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  transition: all var(--transition-fast);
-}
-
-.historyButton:hover {
-  background: var(--color-gray-100);
-  color: var(--color-black);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
 }

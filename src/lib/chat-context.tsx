@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
+import { MOCK_LIBRARY_ASSETS } from '@/lib/mock-data';
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -34,6 +35,10 @@ export interface ChatSession {
   messages: ChatMessage[];
   generatedAssets: GeneratedAsset[];
   createdAt: string;
+  /** Style ID used when session was created (brandStyle for imagine/create, shotStyle for product). */
+  styleId?: string;
+  /** Aspect ratio used when session was created. */
+  aspectRatio?: string;
 }
 
 export interface ImagineOptions {
@@ -88,6 +93,14 @@ export interface ChatState {
   createOptions: CreateOptions;
   /** When set, EditCanvas opens modify popover for the single asset with this prompt (from library Modify). */
   pendingModifyPrompt: string | null;
+  /** Active library collection (style id). Used when activeView is 'library'. */
+  activeLibraryCollection: string;
+  /** Asset IDs that are liked (in library). */
+  likedAssetIds: Set<string>;
+  /** Session ID currently generating images. */
+  generatingSessionId: string | null;
+  /** Session IDs that completed generation but user hasn't opened them yet (green dot). */
+  unseenCompletedSessionIds: Set<string>;
 }
 
 // ── Actions ────────────────────────────────────────────────────────────
@@ -116,7 +129,11 @@ type ChatAction =
   | { type: 'SET_MANAGE_PANEL'; payload: ManagePanelType }
   | { type: 'SET_MANAGER_MODAL'; payload: ManagerModalType }
   | { type: 'SET_MANAGER_MODAL_FORM_INIT'; payload: ManagerModalFormInit }
-  | { type: 'SET_GENERATING_IMAGES'; payload: boolean };
+  | { type: 'SET_GENERATING_IMAGES'; payload: boolean }
+  | { type: 'SET_ACTIVE_LIBRARY_COLLECTION'; payload: string }
+  | { type: 'TOGGLE_LIKED_ASSET'; payload: string }
+  | { type: 'DELETE_SESSION'; payload: string }
+  | { type: 'CLEAR_ALL_SESSIONS' };
 
 // ── Initial State ──────────────────────────────────────────────────────
 
@@ -150,11 +167,19 @@ const initialState: ChatState = {
     brandStyle: '',
   },
   pendingModifyPrompt: null,
+  activeLibraryCollection: '',
+  likedAssetIds: new Set(MOCK_LIBRARY_ASSETS.filter((a) => a.liked).map((a) => a.id)),
+  generatingSessionId: null,
+  unseenCompletedSessionIds: new Set(),
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-function createSession(mode: CreativeMode): ChatSession {
+function createSession(
+  mode: CreativeMode,
+  styleId?: string,
+  aspectRatio?: string
+): ChatSession {
   return {
     id: `session-${Date.now()}`,
     title: 'New conversation',
@@ -162,6 +187,8 @@ function createSession(mode: CreativeMode): ChatSession {
     messages: [],
     generatedAssets: [],
     createdAt: new Date().toISOString(),
+    styleId,
+    aspectRatio,
   };
 }
 
@@ -179,6 +206,38 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'SET_ACTIVE_VIEW':
       return { ...state, activeView: action.payload };
 
+    case 'SET_ACTIVE_LIBRARY_COLLECTION':
+      return { ...state, activeLibraryCollection: action.payload };
+
+    case 'TOGGLE_LIKED_ASSET': {
+      const id = action.payload;
+      const next = new Set(state.likedAssetIds);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return { ...state, likedAssetIds: next };
+    }
+
+    case 'DELETE_SESSION': {
+      const id = action.payload;
+      const updatedSessions = state.sessions.filter((s) => s.id !== id);
+      const wasCurrent = state.currentSession?.id === id;
+      const nextUnseen = new Set(state.unseenCompletedSessionIds);
+      nextUnseen.delete(id);
+      return {
+        ...state,
+        sessions: updatedSessions,
+        currentSession: wasCurrent ? null : state.currentSession,
+        unseenCompletedSessionIds: nextUnseen,
+      };
+    }
+
+    case 'CLEAR_ALL_SESSIONS':
+      return {
+        ...state,
+        sessions: [],
+        currentSession: null,
+      };
+
     case 'SET_MODE': {
       const newMode = action.payload;
       // When going back to idle, close the canvas too
@@ -191,13 +250,14 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'EXIT_MODE':
       // Full reset: go back to landing state, clear current session.
       // Use the session's mode so the correct tab is active (Imagine → Imagine, Chat → Chat).
+      // Keep isGeneratingImages and generatingSessionId so sidebar still shows loading state
+      // when user closes session while generation runs; green dot appears when it finishes.
       const exitMode = state.currentSession?.mode ?? 'imagine';
       return {
         ...state,
         mode: exitMode,
         currentSession: null,
         canvasOpen: false,
-        isGeneratingImages: false,
         pendingModifyPrompt: null,
         imagineOptions: initialState.imagineOptions,
         productOptions: initialState.productOptions,
@@ -208,7 +268,20 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'SEND_MESSAGE': {
       let session = state.currentSession;
       if (!session) {
-        session = createSession(state.mode);
+        const styleId =
+          state.mode === 'imagine' || state.mode === 'create'
+            ? state.imagineOptions.brandStyle
+            : state.mode === 'product'
+              ? state.productOptions.shotStyle
+              : undefined;
+        const aspectRatio =
+          state.mode === 'imagine' ||
+          state.mode === 'product' ||
+          state.mode === 'character' ||
+          state.mode === 'create'
+            ? state.imagineOptions.aspectRatio
+            : undefined;
+        session = createSession(state.mode, styleId, aspectRatio);
       }
       const updatedMessages = [...session.messages, action.payload];
       const updatedSession = {
@@ -246,7 +319,12 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'ADD_GENERATED_ASSET': {
       if (!state.currentSession) return state;
       const updatedAssets = [action.payload, ...state.currentSession.generatedAssets];
-      const updatedSession = { ...state.currentSession, generatedAssets: updatedAssets };
+      const updatedSession = {
+        ...state.currentSession,
+        generatedAssets: updatedAssets,
+        aspectRatio:
+          state.currentSession.aspectRatio ?? action.payload.aspectRatio,
+      };
       const updatedSessions = state.sessions.map((s) =>
         s.id === updatedSession.id ? updatedSession : s
       );
@@ -338,12 +416,15 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'LOAD_SESSION': {
       const session = state.sessions.find((s) => s.id === action.payload);
       if (!session) return state;
+      const nextUnseen = new Set(state.unseenCompletedSessionIds);
+      nextUnseen.delete(action.payload);
       return {
         ...state,
         currentSession: session,
         mode: session.mode,
         canvasOpen: session.generatedAssets.length > 0,
         historyOpen: false,
+        unseenCompletedSessionIds: nextUnseen,
       };
     }
 
@@ -374,6 +455,8 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         messages: [],
         generatedAssets: [asset],
         createdAt: new Date().toISOString(),
+        styleId: state.imagineOptions.brandStyle,
+        aspectRatio: asset.aspectRatio ?? state.imagineOptions.aspectRatio,
       };
       const updatedSessions = [session, ...state.sessions];
       return {
@@ -399,8 +482,28 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'SET_MANAGER_MODAL_FORM_INIT':
       return { ...state, managerModalFormInit: action.payload };
 
-    case 'SET_GENERATING_IMAGES':
-      return { ...state, isGeneratingImages: action.payload };
+    case 'SET_GENERATING_IMAGES': {
+      const isGenerating = action.payload;
+      if (isGenerating) {
+        return {
+          ...state,
+          isGeneratingImages: true,
+          generatingSessionId: state.currentSession?.id ?? null,
+        };
+      }
+      const genId = state.generatingSessionId;
+      const isStillCurrent = genId === state.currentSession?.id;
+      const nextUnseen = new Set(state.unseenCompletedSessionIds);
+      if (genId && !isStillCurrent) {
+        nextUnseen.add(genId);
+      }
+      return {
+        ...state,
+        isGeneratingImages: false,
+        generatingSessionId: null,
+        unseenCompletedSessionIds: nextUnseen,
+      };
+    }
 
     default:
       return state;
@@ -434,13 +537,47 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, [pathname]);
 
-  // Load sessions from localStorage on mount
+  // Load sessions from localStorage on mount, or use example sessions when empty
   useEffect(() => {
     try {
       const raw = localStorage.getItem('open-wonder-chat-sessions');
       if (raw) {
         const sessions = JSON.parse(raw) as ChatSession[];
         dispatch({ type: 'LOAD_SESSIONS', payload: sessions });
+      } else {
+        const exampleSessions: ChatSession[] = [
+          {
+            id: 'session-example-1',
+            title: 'A woman holding a baby standing inside a kitchen',
+            mode: 'imagine',
+            messages: [],
+            generatedAssets: [],
+            createdAt: new Date(Date.now() - 2 * 3600000).toISOString(),
+            styleId: 'style-1',
+            aspectRatio: '16:9',
+          },
+          {
+            id: 'session-example-2',
+            title: 'Minimalist product shot on marble surface',
+            mode: 'imagine',
+            messages: [],
+            generatedAssets: [],
+            createdAt: new Date(Date.now() - 5 * 3600000).toISOString(),
+            styleId: 'style-2',
+            aspectRatio: '1:1',
+          },
+          {
+            id: 'session-example-3',
+            title: 'Cozy interior with warm lighting and plants',
+            mode: 'imagine',
+            messages: [],
+            generatedAssets: [],
+            createdAt: new Date(Date.now() - 24 * 3600000).toISOString(),
+            styleId: 'style-1',
+            aspectRatio: '4:5',
+          },
+        ];
+        dispatch({ type: 'LOAD_SESSIONS', payload: exampleSessions });
       }
     } catch {
       // noop

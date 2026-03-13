@@ -87,7 +87,7 @@ export const MentionSuggestion = Extension.create({
               .run();
           }
         },
-        allow: () => true,
+        allow: () => getMentionMode() !== 'imagine',
         render: () => {
           let root: ReturnType<typeof createRoot> | null = null;
           let container: HTMLDivElement | null = null;

@@ -4,7 +4,6 @@
   justify-content: space-between;
   height: var(--header-height);
   padding: 0 var(--spacing-md);
-  border-bottom: var(--border-default);
   background: var(--color-white);
   flex-shrink: 0;
   position: relative;
@@ -38,116 +37,6 @@
 .right {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
   min-width: 200px;
   justify-content: flex-end;
-}
-
-/* ── Avatar / User Menu ─────────────────────────────────────────── */
-
-.avatarWrap {
-  position: relative;
-}
-
-.avatarButton {
-  cursor: pointer;
-  border-radius: 50%;
-  transition: opacity var(--transition-fast);
-}
-
-.avatarButton:hover {
-  opacity: 0.8;
-}
-
-.userMenu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  width: 260px;
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  z-index: 300;
-  padding: var(--spacing-3xs);
-  animation: menuFadeIn 150ms ease-out;
-}
-
-@keyframes menuFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.menuHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  margin-bottom: var(--spacing-3xs);
-}
-
-.menuHeaderInfo {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.menuHeaderName {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-black);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.menuHeaderEmail {
-  font-size: var(--font-size-xs);
-  color: var(--color-gray-500);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.menuDivider {
-  height: 1px;
-  background: var(--color-dividerdefault);
-  margin: var(--spacing-3xs) var(--spacing-xs);
-}
-
-.menuItem,
-.menuItemDanger {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  width: 100%;
-  padding: var(--dimension-8) var(--dimension-12);
-  border-radius: var(--dimension-cornerroundings-xs-corner);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-  text-align: left;
-}
-
-.menuItem {
-  color: var(--color-gray-700);
-}
-
-.menuItem:hover {
-  background: var(--color-button-text-hoverfill);
-  color: var(--color-black);
-}
-
-.menuItemDanger {
-  color: var(--color-element-toast-error-text);
-}
-
-.menuItemDanger:hover {
-  background: var(--color-element-toast-error-fill);
 }

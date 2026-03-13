@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { ClockCounterClockwise, X } from '@phosphor-icons/react';
+import { X } from '@phosphor-icons/react';
 import ChatInput from '@/components/chat/ChatInput/ChatInput';
 import ChatMessages from '@/components/chat/ChatMessages/ChatMessages';
 import ChatSessionHistory from '@/components/chat/ChatSessionHistory/ChatSessionHistory';
@@ -226,21 +226,10 @@ export default function ChatLanding() {
     }, 1200);
   };
 
-  const historyButton = (
-    <button
-      className={styles.historyButton}
-      onClick={() => dispatch({ type: 'SET_HISTORY_OPEN', payload: !state.historyOpen })}
-    >
-      <ClockCounterClockwise size={16} />
-      History
-    </button>
-  );
-
   const transition = { duration: 0.45, ease: [0.4, 0, 0.2, 1] as const };
 
   return (
     <div className={styles.viewWrapper}>
-      <div className={styles.historyDock}>{historyButton}</div>
       <LayoutGroup>
         <div className={styles.animateArea}>
           <AnimatePresence mode="sync">

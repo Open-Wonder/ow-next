@@ -1,8 +1,5 @@
 .wrapper {
   position: relative;
-  margin-bottom: var(--spacing-2xs);
-  padding-bottom: var(--spacing-xs);
-  border-bottom: var(--border-default);
 }
 
 .trigger {

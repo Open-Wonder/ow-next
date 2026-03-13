@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -15,12 +15,9 @@ import {
 } from '@phosphor-icons/react';
 import cn from 'classnames';
 import {
-  MOCK_BRAND_STYLES,
   MOCK_LIBRARY_ASSETS,
   MOCK_PRODUCTS,
   MOCK_PRODUCT_STYLES,
-  MOCK_CHARACTERS,
-  MOCK_CHARACTER_LOCATIONS,
 } from '@/lib/mock-data';
 import ContextMenu, { type MenuItem } from '@/components/common/ContextMenu/ContextMenu';
 import IconButton from '@/components/common/IconButton';
@@ -36,14 +33,9 @@ type StyleFilter = string; // style id, or '' for no filter
 // ── Component ───────────────────────────────────────────────────────────
 
 export default function LibraryView() {
-  const { dispatch } = useChat();
-  const [styleFilter, setStyleFilter] = useState<StyleFilter>(
-    () => MOCK_BRAND_STYLES[0]?.id ?? ''
-  );
+  const { state, dispatch } = useChat();
+  const styleFilter = state.activeLibraryCollection;
   const [productFilter, setProductFilter] = useState('');
-  const [productStyleFilter, setProductStyleFilter] = useState('');
-  const [characterFilter, setCharacterFilter] = useState('');
-  const [locationFilter, setLocationFilter] = useState('');
   const [search, setSearch] = useState('');
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
   const [actionMenuPosition, setActionMenuPosition] = useState({ x: 0, y: 0 });
@@ -62,28 +54,17 @@ export default function LibraryView() {
   const [libraryModifyPrompt, setLibraryModifyPrompt] = useState('');
   const libraryModifyInputRef = useRef<HTMLInputElement>(null);
 
-  // Liked asset IDs (unliking removes from library view)
-  const [likedIds, setLikedIds] = useState<Set<string>>(() =>
-    new Set(MOCK_LIBRARY_ASSETS.filter((a) => a.liked).map((a) => a.id))
-  );
+  const likedIds = state.likedAssetIds;
 
   const toggleLiked = (e: React.MouseEvent, assetId: string) => {
     e.stopPropagation();
-    setLikedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(assetId)) next.delete(assetId);
-      else next.add(assetId);
-      return next;
-    });
+    dispatch({ type: 'TOGGLE_LIKED_ASSET', payload: assetId });
   };
 
-  const handleStyleFilterChange = (styleId: string) => {
-    setStyleFilter(styleId);
+  // Clear product filter when collection changes
+  useEffect(() => {
     setProductFilter('');
-    setProductStyleFilter('');
-    setCharacterFilter('');
-    setLocationFilter('');
-  };
+  }, [styleFilter]);
 
   // Filtered assets, sorted by most recent first (only show liked assets)
   const filteredAssets = useMemo(() => {
@@ -92,29 +73,21 @@ export default function LibraryView() {
     // Only show liked
     result = result.filter((a) => likedIds.has(a.id));
 
-    // Style filter
+    // Collection filter
     if (styleFilter) {
-      result = result.filter((a) => a.styleId === styleFilter);
-    }
-
-    // Products sub-filters
-    if (styleFilter === 'style-3') {
-      if (productFilter) {
-        result = result.filter((a) => 'productId' in a && a.productId === productFilter);
-      }
-      if (productStyleFilter) {
-        result = result.filter((a) => 'productStyleId' in a && a.productStyleId === productStyleFilter);
+      const isProductStyle = MOCK_PRODUCT_STYLES.some((s) => s.id === styleFilter);
+      if (isProductStyle) {
+        result = result.filter(
+          (a) => a.styleId === 'style-3' && 'productStyleId' in a && a.productStyleId === styleFilter
+        );
+      } else {
+        result = result.filter((a) => a.styleId === styleFilter);
       }
     }
 
-    // Characters sub-filters
-    if (styleFilter === 'style-4') {
-      if (characterFilter) {
-        result = result.filter((a) => 'characterId' in a && a.characterId === characterFilter);
-      }
-      if (locationFilter) {
-        result = result.filter((a) => 'locationId' in a && a.locationId === locationFilter);
-      }
+    // Product sub-filter within a product style collection
+    if (productFilter) {
+      result = result.filter((a) => 'productId' in a && a.productId === productFilter);
     }
 
     // Search
@@ -127,18 +100,7 @@ export default function LibraryView() {
     result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return result;
-  }, [styleFilter, search, likedIds, productFilter, productStyleFilter, characterFilter, locationFilter]);
-
-  // Asset count per style (only count liked assets)
-  const styleCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const asset of MOCK_LIBRARY_ASSETS) {
-      if (asset.styleId && likedIds.has(asset.id)) {
-        counts[asset.styleId] = (counts[asset.styleId] ?? 0) + 1;
-      }
-    }
-    return counts;
-  }, [likedIds]);
+  }, [styleFilter, search, likedIds, productFilter]);
 
   const handleContextMenu = (e: React.MouseEvent, assetId: string) => {
     e.preventDefault();
@@ -275,28 +237,7 @@ export default function LibraryView() {
 
   return (
     <div className={styles.layout}>
-      {/* ── Sidebar (style-based nav) ───────────────────────────────────── */}
-      <aside className={styles.sidebar}>
-        <div className={styles.sidebarSection}>
-          {MOCK_BRAND_STYLES.map((style) => (
-            <button
-              key={style.id}
-              className={cn(
-                styles.sidebarItem,
-                styleFilter === style.id && styles.sidebarItemActive
-              )}
-              onClick={() => handleStyleFilterChange(style.id)}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={style.image} alt="" className={styles.sidebarThumb} />
-              <span className={styles.sidebarLabel}>{style.name}</span>
-              <span className={styles.sidebarCount}>{styleCounts[style.id] ?? 0}</span>
-            </button>
-          ))}
-        </div>
-      </aside>
-
-      {/* ── Main Content ──────────────────────────────────────────── */}
+      {/* ── Main Content (collections are in global HistorySidebar) ─────── */}
       <main className={styles.main}>
         {/* Header */}
         <div className={styles.mainHeader}>
@@ -310,8 +251,8 @@ export default function LibraryView() {
             />
           </div>
 
-          {/* Inline filter selects (Products / Characters) — same styling as ratio select */}
-          {styleFilter === 'style-3' && (
+          {/* Product filter within product style collection */}
+          {MOCK_PRODUCT_STYLES.some((s) => s.id === styleFilter) && (
             <div className={styles.filterChips}>
               <CustomSelect
                 id="library-product-filter"
@@ -323,49 +264,6 @@ export default function LibraryView() {
                 ]}
                 placeholder="Product · All"
                 triggerPrefix="Product · "
-                size="sm"
-                className={styles.filterSelect}
-              />
-              <CustomSelect
-                id="library-style-filter"
-                value={productStyleFilter}
-                onValueChange={setProductStyleFilter}
-                options={[
-                  { value: '', label: 'All' },
-                  ...MOCK_PRODUCT_STYLES.map((s) => ({ value: s.id, label: s.name, imageUrl: s.image })),
-                ]}
-                placeholder="Style · All"
-                triggerPrefix="Style · "
-                size="sm"
-                className={styles.filterSelect}
-              />
-            </div>
-          )}
-          {styleFilter === 'style-4' && (
-            <div className={styles.filterChips}>
-              <CustomSelect
-                id="library-character-filter"
-                value={characterFilter}
-                onValueChange={setCharacterFilter}
-                options={[
-                  { value: '', label: 'All' },
-                  ...MOCK_CHARACTERS.map((c) => ({ value: c.id, label: c.name, imageUrl: c.image })),
-                ]}
-                placeholder="Character · All"
-                triggerPrefix="Character · "
-                size="sm"
-                className={styles.filterSelect}
-              />
-              <CustomSelect
-                id="library-location-filter"
-                value={locationFilter}
-                onValueChange={setLocationFilter}
-                options={[
-                  { value: '', label: 'All' },
-                  ...MOCK_CHARACTER_LOCATIONS.map((loc) => ({ value: loc.id, label: loc.name, imageUrl: loc.image })),
-                ]}
-                placeholder="Location · All"
-                triggerPrefix="Location · "
                 size="sm"
                 className={styles.filterSelect}
               />

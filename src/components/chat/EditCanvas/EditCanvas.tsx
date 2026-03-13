@@ -135,13 +135,7 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
     >
       <div className={styles.header}>
         <h3 className={styles.title}>Imagine Session</h3>
-        <span className={styles.count}>
-          {isGenerating
-            ? assets.length > 0
-              ? `Generating... ${assets.length}/4`
-              : 'Generating...'
-            : `${assets.length} ${assets.length === 1 ? 'asset' : 'assets'}`}
-        </span>
+        <span className={styles.headerSpacer} />
         <Button
           variant="secondary"
           size="sm"

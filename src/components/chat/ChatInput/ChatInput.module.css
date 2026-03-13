@@ -116,7 +116,7 @@
   gap: 4px;
   padding: 3px 8px 3px 5px;
   border-radius: var(--radius-full);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
   animation: tagIn 200ms ease-out;
@@ -188,7 +188,7 @@
   gap: 4px;
   padding: 2px 6px 2px 4px;
   border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
+  font-size: 16px;
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
   line-height: var(--line-height-normal);
@@ -215,7 +215,7 @@
 
 .promptEditor :global(.ProseMirror) {
   font-family: var(--font-family-default);
-  font-size: var(--font-size-sm);
+  font-size: 16px;
   color: var(--color-black);
   background: transparent;
   outline: none;
@@ -241,7 +241,7 @@
 .textarea {
   flex: 1;
   font-family: var(--font-family-default);
-  font-size: var(--font-size-sm);
+  font-size: 16px;
   color: var(--color-black);
   background: transparent;
   border: none;

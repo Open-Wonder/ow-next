@@ -47,11 +47,11 @@ const BOX_MODES: { id: CreativeMode; icon: React.ReactNode }[] = [
 
 const MODE_LABELS: Record<CreativeMode, string> = {
   idle: 'General',
-  imagine: 'Imagine',
-  product: 'Product',
+  imagine: 'On Brand Images',
+  product: 'Product to Image',
   character: 'Character',
   create: 'Create',
-  assistant: 'Chat',
+  assistant: 'Brand Chat',
 };
 
 export default function ModeBoxes() {
@@ -64,7 +64,10 @@ export default function ModeBoxes() {
   const effectiveMode = state.mode === 'idle' ? 'imagine' : state.mode;
 
   const visibleModes = BOX_MODES.filter(
-    (m) => isModeVisible(m.id) && (m.id !== 'assistant' || hasAssistant)
+    (m) =>
+      m.id !== 'character' &&
+      isModeVisible(m.id) &&
+      (m.id !== 'assistant' || hasAssistant)
   );
 
   const handleLockedHover = (mode: CreativeMode, entering: boolean) => {

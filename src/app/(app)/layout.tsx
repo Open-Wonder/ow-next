@@ -3,10 +3,10 @@
 import { usePathname } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import TopBar from '@/components/layout/TopBar/TopBar';
+import HistorySidebar from '@/components/layout/HistorySidebar/HistorySidebar';
 import ViewTransition from '@/components/layout/ViewTransition/ViewTransition';
 import ChatLanding from '@/components/chat/ChatLanding/ChatLanding';
 import EditCanvas from '@/components/chat/EditCanvas/EditCanvas';
-import ChatHistory from '@/components/chat/ChatHistory/ChatHistory';
 import LibraryView from '@/components/library/LibraryView/LibraryView';
 import ManageListView from '@/components/manage/ManageListView/ManageListView';
 import ImageStyleModal from '@/components/manage/ManagerModal/ImageStyleModal';
@@ -66,19 +66,21 @@ function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={styles.shell}>
-      <TopBar />
-      {isManageRoute ? (
-        <main className={styles.manageOutlet}>{children}</main>
-      ) : (
-        <ViewTransition
-          createView={<CreateView />}
-          libraryView={<LibraryPanel />}
-          manageView={<ManagePanel />}
-        />
-      )}
-      <AnimatePresence>
-        {state.historyOpen && <ChatHistory />}
-      </AnimatePresence>
+      <HistorySidebar />
+      <div className={styles.contentArea}>
+        <TopBar />
+        <div className={styles.main}>
+          {isManageRoute ? (
+            <main className={styles.manageOutlet}>{children}</main>
+          ) : (
+            <ViewTransition
+              createView={<CreateView />}
+              libraryView={<LibraryPanel />}
+              manageView={<ManagePanel />}
+            />
+          )}
+        </div>
+      </div>
       <AnimatePresence>
         {state.activeManagerModal === 'imageStyle' && <ImageStyleModal key="imageStyle" />}
         {state.activeManagerModal === 'products' && <ProductsModal key="products" />}
