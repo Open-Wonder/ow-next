@@ -1,5 +1,11 @@
 'use client';
 
+import {
+  Crop,
+  RectangleDashed,
+  Rectangle as RectangleIcon,
+  Square as SquareIcon,
+} from '@phosphor-icons/react';
 import CustomSelect from '@/components/common/Select';
 import {
   DEFAULT_FORMAT_IMAGE_CREATION,
@@ -10,6 +16,28 @@ import {
   IMAGE_FORMATS_IMAGE_MODIFY,
   type ImageFormat,
 } from '@/lib/config/imageFormats';
+
+/* Phosphor outline icons for aspect ratios */
+const iconProps = { weight: 'regular' as const };
+const Icon16x9 = (p: React.SVGProps<SVGSVGElement>) => (
+  <RectangleIcon size={p.width ?? 16} {...iconProps} />
+);
+const Icon1x1 = (p: React.SVGProps<SVGSVGElement>) => (
+  <SquareIcon size={p.width ?? 16} {...iconProps} />
+);
+const Icon4x5 = (p: React.SVGProps<SVGSVGElement>) => (
+  <RectangleDashed size={p.width ?? 16} {...iconProps} />
+);
+const IconAuto = (p: React.SVGProps<SVGSVGElement>) => (
+  <Crop size={p.width ?? 16} {...iconProps} />
+);
+
+const ASPECT_ICONS: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
+  '16:9': Icon16x9,
+  '1:1': Icon1x1,
+  '4:5': Icon4x5,
+  auto: IconAuto,
+};
 
 type AspectRatioSelectorProps = {
   value?: string;
@@ -53,6 +81,7 @@ export default function AspectRatioSelector({
   const options = imageFormats.map((format) => ({
     value: format.id,
     label: format.label,
+    icon: ASPECT_ICONS[format.id] ?? ASPECT_ICONS['1:1'],
   }));
 
   return (
@@ -64,6 +93,7 @@ export default function AspectRatioSelector({
       disabled={disabled}
       size={size}
       placeholder="Select aspect ratio"
+      hideChevron
     />
   );
 }

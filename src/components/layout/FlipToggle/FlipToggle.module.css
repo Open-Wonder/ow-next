@@ -3,6 +3,8 @@
   align-items: center;
   background: var(--color-gray-100);
   border-radius: var(--radius-full);
+  box-sizing: border-box;
+  height: 40px;
   padding: 3px;
   gap: 2px;
 }
@@ -12,7 +14,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 16px;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0 16px;
   border-radius: var(--radius-full);
   cursor: pointer;
   user-select: none;

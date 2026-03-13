@@ -8,6 +8,7 @@ import {
 } from '@phosphor-icons/react';
 import cn from 'classnames';
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/common/Button';
 import styles from './Select.module.css';
 
@@ -18,6 +19,8 @@ type Option = {
   disabled?: boolean;
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   imageUrl?: string;
+  description?: string;
+  previews?: string[];
 };
 
 type ItemValue = {
@@ -26,6 +29,8 @@ type ItemValue = {
   disabled?: boolean;
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   imageUrl?: string;
+  description?: string;
+  previews?: string[];
 };
 
 type GroupedItemValue = {
@@ -51,6 +56,10 @@ type SelectProps = {
   emptyMessage?: string;
   /** Prefix shown on trigger before selected label (e.g. "Product · ") */
   triggerPrefix?: string;
+  /** Hide the dropdown chevron in trigger button. */
+  hideChevron?: boolean;
+  /** Optional icon shown when no value is selected. */
+  placeholderIcon?: React.ReactNode;
 };
 
 export default function CustomSelect({
@@ -70,6 +79,8 @@ export default function CustomSelect({
   searchPlaceholder = 'Search...',
   emptyMessage = 'No options found',
   triggerPrefix,
+  hideChevron = false,
+  placeholderIcon,
 }: SelectProps) {
   const formGroupClasses = cn(styles.formGroup, className);
 
@@ -91,6 +102,8 @@ export default function CustomSelect({
     disabled: opt.disabled,
     icon: opt.icon,
     imageUrl: opt.imageUrl,
+    description: opt.description,
+    previews: opt.previews,
   }));
 
   const groupedItems: GroupedItemValue[] | undefined = hasGroups
@@ -164,10 +177,19 @@ export default function CustomSelect({
                 {...(buttonProps as React.ComponentProps<typeof Button>)}
                 id={id}
                 variant="secondary"
-                icon={selectedOption?.icon && !selectedOption?.imageUrl && (() => {
-                  const Icon = selectedOption.icon!;
-                  return <Icon width={16} height={16} />;
-                })()}
+                icon={
+                  selectedOption?.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={selectedOption.imageUrl} alt="" className={styles.triggerImage} />
+                  ) : selectedOption?.icon ? (
+                    (() => {
+                      const Icon = selectedOption.icon!;
+                      return <Icon width={16} height={16} />;
+                    })()
+                  ) : !selectedOption ? (
+                    placeholderIcon
+                  ) : undefined
+                }
                 size={size === 'lg' ? 'md' : size}
                 disabled={disabled}
                 className={cn(
@@ -185,9 +207,11 @@ export default function CustomSelect({
                 ) : (
                   <Combobox.Value placeholder={placeholder} />
                 )}
-                <span className={styles.chevron}>
-                  <CaretDownIcon size={16} />
-                </span>
+                {!hideChevron && (
+                  <span className={styles.chevron}>
+                    <CaretDownIcon size={16} />
+                  </span>
+                )}
               </Button>
             );
           }}
@@ -280,6 +304,47 @@ const ComboboxItem = React.forwardRef<
     { children, value, disabled, className, icon: Icon, imageUrl, ...props },
     forwardedRef
   ) => {
+    const [showPreview, setShowPreview] = React.useState(false);
+    const [portalPosition, setPortalPosition] = React.useState<{ top: number; left: number } | null>(
+      null
+    );
+    const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+    const wrapperRef = React.useRef<HTMLDivElement>(null);
+
+    const handleMouseEnter = React.useCallback(() => {
+      if (!value.previews?.length && !value.description) return;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        if (wrapperRef.current) {
+          const rect = wrapperRef.current.getBoundingClientRect();
+          setPortalPosition({
+            top: rect.top - 8,
+            left: rect.left + rect.width / 2,
+          });
+        }
+        setShowPreview(true);
+        timeoutRef.current = null;
+      }, 150);
+    }, [value.description, value.previews]);
+
+    const handleMouseLeave = React.useCallback(() => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      setShowPreview(false);
+    }, []);
+
+    React.useEffect(() => {
+      return () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+      };
+    }, []);
+
     const leadingContent = imageUrl ? (
       // eslint-disable-next-line @next/next/no-img-element
       <img src={imageUrl} alt="" className={styles.itemImage} />
@@ -288,33 +353,65 @@ const ComboboxItem = React.forwardRef<
     ) : null;
 
     return (
-      <Combobox.Item
-        className={cn(styles.item, className)}
-        value={value}
-        disabled={disabled}
-        ref={forwardedRef}
-        {...props}
-      >
-        <div className={styles.itemContent}>
-          <Button
-            variant="text"
-            size="md"
-            disabled={disabled}
-            className={styles.itemButton}
-            classNames={{
-              inner: styles.itemButtonInner,
-              content: styles.itemButtonContent,
-              ellipsisText: styles.itemButtonEllipsisText,
-            }}
-            icon={leadingContent}
+      <>
+        <Combobox.Item
+          className={cn(styles.item, className)}
+          value={value}
+          disabled={disabled}
+          ref={forwardedRef}
+          {...props}
+        >
+          <div
+            ref={wrapperRef}
+            className={styles.itemHoverTarget}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
-            {children}
-          </Button>
-        </div>
-        <Combobox.ItemIndicator className={styles.itemIndicator}>
-          <CheckIcon size={16} />
-        </Combobox.ItemIndicator>
-      </Combobox.Item>
+            <div className={styles.itemContent}>
+              <Button
+                variant="text"
+                size="md"
+                disabled={disabled}
+                className={styles.itemButton}
+                classNames={{
+                  inner: styles.itemButtonInner,
+                  content: styles.itemButtonContent,
+                  ellipsisText: styles.itemButtonEllipsisText,
+                }}
+                icon={leadingContent}
+              >
+                {children}
+              </Button>
+            </div>
+          </div>
+          <Combobox.ItemIndicator className={styles.itemIndicator}>
+            <CheckIcon size={16} />
+          </Combobox.ItemIndicator>
+        </Combobox.Item>
+        {typeof document !== 'undefined' &&
+          showPreview &&
+          portalPosition &&
+          createPortal(
+            <div
+              className={styles.previewCard}
+              style={{ top: portalPosition.top, left: portalPosition.left }}
+            >
+              {value.previews && value.previews.length > 0 && (
+                <div className={styles.previewImages}>
+                  {value.previews.slice(0, 3).map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={i} src={url} alt="" className={styles.previewImage} />
+                  ))}
+                </div>
+              )}
+              <div className={styles.previewName}>{value.label}</div>
+              {value.description && (
+                <div className={styles.previewDescription}>{value.description}</div>
+              )}
+            </div>,
+            document.body
+          )}
+      </>
     );
   }
 );

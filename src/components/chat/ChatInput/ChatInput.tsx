@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  PaperPlaneRight,
+  ArrowUp,
+  ImageSquare,
   X,
   Check,
 } from '@phosphor-icons/react';
@@ -17,6 +18,7 @@ import {
   MOCK_AD_TEMPLATES,
 } from '@/lib/mock-data';
 import { Button } from '@/components/common/Button';
+import CustomSelect from '@/components/common/Select';
 import Box from '@/components/common/Box';
 import StyleChip from '@/components/chat/StyleChip/StyleChip';
 import PromptEditor, { type PromptEditorRef } from '@/components/chat/ChatInput/PromptEditor';
@@ -131,6 +133,18 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
     }
   };
 
+  const pickerSendButton = (
+    <Button
+      variant="primary"
+      size="sm"
+      disabled={!canSend}
+      icon={<ArrowUp size={18} weight="bold" />}
+      className={styles.sendButton}
+      classNames={{ inner: styles.sendButtonInner }}
+      onClick={handleSend}
+    />
+  );
+
   /* Derive inline tags from current state (product/character use PromptEditor; create mode uses tags) */
   const inlineTags: InlineTag[] = [];
 
@@ -153,16 +167,16 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
       ? 'Choose a mode below to get started'
       : mode === 'imagine'
         ? state.imagineOptions.brandStyle
-          ? 'Describe the image you want to create...'
-          : 'Select a brand style below, then describe the image you want'
+          ? 'Describe what you see - I will generate on-brand images and videos for you.'
+          : 'Describe what you see - I will generate on-brand images and videos for you. Select a brand style below first.'
         : mode === 'product'
           ? state.productOptions.shotStyle
-            ? 'Add products with @ and describe the scene...'
-            : 'Select a shot style below, then add products with @'
+            ? 'Add products with @, pick a shot style, and describe the scene.'
+            : 'Add products with @, pick a shot style, and describe the scene. Select a shot style below first.'
           : mode === 'character'
             ? state.characterOptions.location
-              ? 'Add characters with @ and describe the scene...'
-              : 'Select a location below, then add characters with @'
+              ? 'Add characters with @, pick a location, and describe the scene.'
+              : 'Add characters with @, pick a location, and describe the scene. Select a location below first.'
             : mode === 'assistant'
               ? 'Ask me anything about your brand'
               : 'Select a format below, then describe the ad you want to create';
@@ -208,19 +222,17 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
               rows={1}
             />
           )}
-          <Button
-            variant="primary"
-            size="sm"
-            disabled={!canSend}
-            icon={mode !== 'imagine' ? <PaperPlaneRight size={18} /> : undefined}
-            onClick={handleSend}
-          >
-            {mode === 'imagine'
-              ? inImageSessionView
-                ? 'Create more'
-                : 'Create Images'
-              : ''}
-          </Button>
+          {mode === 'idle' && (
+            <Button
+              variant="primary"
+              size="sm"
+              disabled={!canSend}
+              icon={<ArrowUp size={18} weight="bold" />}
+              className={styles.sendButton}
+              classNames={{ inner: styles.sendButtonInner }}
+              onClick={handleSend}
+            />
+          )}
         </div>
       </div>
 
@@ -228,10 +240,15 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
       {mode !== 'idle' && (
         <div className={styles.pickerBar}>
           <div className={styles.pickerBarInner}>
-            {mode === 'imagine' && <ImaginePickers />}
-            {mode === 'product' && <ProductPickers />}
-            {mode === 'character' && <CharacterPickers />}
-            {mode === 'create' && <CreatePickers />}
+            {mode === 'imagine' && (
+              <ImaginePickers
+                createButton={pickerSendButton}
+              />
+            )}
+            {mode === 'product' && <ProductPickers createButton={pickerSendButton} />}
+            {mode === 'character' && <CharacterPickers createButton={pickerSendButton} />}
+            {mode === 'create' && <CreatePickers createButton={pickerSendButton} />}
+            {mode === 'assistant' && <AssistantPickers createButton={pickerSendButton} />}
           </div>
         </div>
       )}
@@ -241,11 +258,9 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
 
 /* ── Imagine Pickers ────────────────────────────────────────────────── */
 
-function ImaginePickers() {
+function ImaginePickers({ createButton }: { createButton: React.ReactNode }) {
   const { state, dispatch } = useChat();
   const opts = state.imagineOptions;
-  const hasMessages = state.currentSession && state.currentSession.messages.length > 0;
-  const inSessionView = state.mode === 'imagine' && hasMessages;
 
   const isValidCreateFormat = IMAGE_FORMATS_IMAGE_CREATION.some(
     (f) => f.aspectRatio === opts.aspectRatio
@@ -255,105 +270,171 @@ function ImaginePickers() {
   return (
     <div className={styles.pickerRow}>
       <div className={styles.pickerRowLeft}>
-        {(inSessionView
-          ? MOCK_BRAND_STYLES.filter((s) => opts.brandStyle === s.id)
-          : MOCK_IMAGE_STYLES
-        ).map((s) => (
-          <StyleChip
-            key={s.id}
-            name={s.name}
-            image={s.image}
-            description={s.description}
-            previews={s.previews}
-            isActive={opts.brandStyle === s.id}
-            onClick={() =>
+        <div className={styles.styleSelectWrap}>
+          <CustomSelect
+            id="imagine-style-selector"
+            value={opts.brandStyle || undefined}
+            onValueChange={(value) =>
               dispatch({
                 type: 'SET_IMAGINE_OPTIONS',
-                payload: { brandStyle: opts.brandStyle === s.id ? '' : s.id },
+                payload: { brandStyle: value },
               })
             }
+            options={MOCK_IMAGE_STYLES.map((s) => ({
+              value: s.id,
+              label: s.name,
+              imageUrl: s.image,
+              description: s.description,
+              previews: s.previews,
+            }))}
+            size="sm"
+            placeholder="Select Style"
+            placeholderIcon={<ImageSquare size={16} />}
           />
-        ))}
+        </div>
+        <div className={styles.formatSelectWrapInline}>
+          <AspectRatioSelector
+            value={displayValue}
+            onChange={(format) =>
+              dispatch({
+                type: 'SET_IMAGINE_OPTIONS',
+                payload: {
+                  aspectRatio: format.aspectRatio as '16:9' | '1:1' | '4:5',
+                },
+              })
+            }
+            type="create"
+            size="sm"
+            disabled={state.isGeneratingImages}
+          />
+        </div>
       </div>
-      <div className={styles.formatSelectWrap}>
-        <AspectRatioSelector
-          value={displayValue}
-          onChange={(format) =>
-            dispatch({
-              type: 'SET_IMAGINE_OPTIONS',
-              payload: {
-                aspectRatio: format.aspectRatio as '16:9' | '1:1' | '4:5',
-              },
-            })
-          }
-          type="create"
-          size="sm"
-          disabled={state.isGeneratingImages}
-        />
-      </div>
+      <div className={styles.createButtonWrap}>{createButton}</div>
     </div>
   );
 }
 
 /* ── Product Pickers ────────────────────────────────────────────────── */
 
-function ProductPickers() {
+function ProductPickers({ createButton }: { createButton: React.ReactNode }) {
   const { state, dispatch } = useChat();
   const opts = state.productOptions;
+  const isValidCreateFormat = IMAGE_FORMATS_IMAGE_CREATION.some(
+    (f) => f.aspectRatio === state.imagineOptions.aspectRatio
+  );
+  const displayValue = isValidCreateFormat
+    ? state.imagineOptions.aspectRatio
+    : DEFAULT_FORMAT_IMAGE_CREATION.id;
 
   return (
     <div className={styles.pickerRow}>
-      {MOCK_PRODUCT_STYLES.map((s) => (
-        <StyleChip
-          key={s.id}
-          name={s.name}
-          image={s.image}
-          description={s.description}
-          previews={s.previews}
-          isActive={opts.shotStyle === s.id}
-          onClick={() =>
-            dispatch({
-              type: 'SET_PRODUCT_OPTIONS',
-              payload: { shotStyle: opts.shotStyle === s.id ? '' : s.id },
-            })
-          }
-        />
-      ))}
+      <div className={styles.pickerRowLeft}>
+        <div className={styles.styleSelectWrap}>
+          <CustomSelect
+            id="product-style-selector"
+            value={opts.shotStyle || undefined}
+            onValueChange={(value) =>
+              dispatch({
+                type: 'SET_PRODUCT_OPTIONS',
+                payload: { shotStyle: value },
+              })
+            }
+            options={MOCK_PRODUCT_STYLES.map((s) => ({
+              value: s.id,
+              label: s.name,
+              imageUrl: s.image,
+              description: s.description,
+              previews: s.previews,
+            }))}
+            size="sm"
+            placeholder="Select Style"
+            placeholderIcon={<ImageSquare size={16} />}
+          />
+        </div>
+        <div className={styles.formatSelectWrapInline}>
+          <AspectRatioSelector
+            value={displayValue}
+            onChange={(format) =>
+              dispatch({
+                type: 'SET_IMAGINE_OPTIONS',
+                payload: {
+                  aspectRatio: format.aspectRatio as '16:9' | '1:1' | '4:5',
+                },
+              })
+            }
+            type="create"
+            size="sm"
+            disabled={state.isGeneratingImages}
+          />
+        </div>
+      </div>
+      <div className={styles.createButtonWrap}>{createButton}</div>
     </div>
   );
 }
 
 /* ── Character Pickers ──────────────────────────────────────────────── */
 
-function CharacterPickers() {
+function CharacterPickers({ createButton }: { createButton: React.ReactNode }) {
   const { state, dispatch } = useChat();
   const opts = state.characterOptions;
+  const isValidCreateFormat = IMAGE_FORMATS_IMAGE_CREATION.some(
+    (f) => f.aspectRatio === state.imagineOptions.aspectRatio
+  );
+  const displayValue = isValidCreateFormat
+    ? state.imagineOptions.aspectRatio
+    : DEFAULT_FORMAT_IMAGE_CREATION.id;
 
   return (
     <div className={styles.pickerRow}>
-      {MOCK_CHARACTER_LOCATIONS.map((s) => (
-        <StyleChip
-          key={s.id}
-          name={s.name}
-          image={s.image}
-          description={s.description}
-          previews={s.previews}
-          isActive={opts.location === s.id}
-          onClick={() =>
-            dispatch({
-              type: 'SET_CHARACTER_OPTIONS',
-              payload: { location: opts.location === s.id ? '' : s.id },
-            })
-          }
-        />
-      ))}
+      <div className={styles.pickerRowLeft}>
+        <div className={styles.styleSelectWrap}>
+          <CustomSelect
+            id="character-style-selector"
+            value={opts.location || undefined}
+            onValueChange={(value) =>
+              dispatch({
+                type: 'SET_CHARACTER_OPTIONS',
+                payload: { location: value },
+              })
+            }
+            options={MOCK_CHARACTER_LOCATIONS.map((s) => ({
+              value: s.id,
+              label: s.name,
+              imageUrl: s.image,
+              description: s.description,
+              previews: s.previews,
+            }))}
+            size="sm"
+            placeholder="Select Style"
+            placeholderIcon={<ImageSquare size={16} />}
+          />
+        </div>
+        <div className={styles.formatSelectWrapInline}>
+          <AspectRatioSelector
+            value={displayValue}
+            onChange={(format) =>
+              dispatch({
+                type: 'SET_IMAGINE_OPTIONS',
+                payload: {
+                  aspectRatio: format.aspectRatio as '16:9' | '1:1' | '4:5',
+                },
+              })
+            }
+            type="create"
+            size="sm"
+            disabled={state.isGeneratingImages}
+          />
+        </div>
+      </div>
+      <div className={styles.createButtonWrap}>{createButton}</div>
     </div>
   );
 }
 
 /* ── Create (Ads) Pickers ───────────────────────────────────────────── */
 
-function CreatePickers() {
+function CreatePickers({ createButton }: { createButton: React.ReactNode }) {
   const { state, dispatch } = useChat();
   const opts = state.createOptions;
 
@@ -382,6 +463,7 @@ function CreatePickers() {
             <span className={styles.chipMeta}>{t.dimensions}</span>
           </Button>
         ))}
+        <div className={styles.createButtonWrap}>{createButton}</div>
       </div>
 
       <div className={styles.pickerRow}>
@@ -403,5 +485,14 @@ function CreatePickers() {
         ))}
       </div>
     </>
+  );
+}
+
+function AssistantPickers({ createButton }: { createButton: React.ReactNode }) {
+  return (
+    <div className={styles.pickerRow}>
+      <div className={styles.pickerRowLeft} />
+      <div className={styles.createButtonWrap}>{createButton}</div>
+    </div>
   );
 }

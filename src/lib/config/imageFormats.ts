@@ -5,22 +5,22 @@ type Quality = {
 };
 
 export const ASPECT_RATIO_OPTIONS_CREATE = [
-  { value: '16:9' as const, label: 'Landscape (16:9)', factor: 16 / 9 },
-  { value: '1:1' as const, label: 'Square (1:1)', factor: 1 / 1 },
-  { value: '4:5' as const, label: 'Portrait (4:5)', factor: 4 / 5 },
+  { value: '16:9' as const, label: '16:9', factor: 16 / 9 },
+  { value: '1:1' as const, label: '1:1', factor: 1 / 1 },
+  { value: '4:5' as const, label: '4:5', factor: 4 / 5 },
 ] as const;
 
 export const ASPECT_RATIO_OPTIONS_MODIFY = [
   { value: 'auto' as const, label: 'Auto', factor: 0 },
-  { value: '16:9' as const, label: 'Landscape (16:9)', factor: 16 / 9 },
-  { value: '1:1' as const, label: 'Square (1:1)', factor: 1 / 1 },
-  { value: '4:5' as const, label: 'Portrait (4:5)', factor: 4 / 5 },
+  { value: '16:9' as const, label: '16:9', factor: 16 / 9 },
+  { value: '1:1' as const, label: '1:1', factor: 1 / 1 },
+  { value: '4:5' as const, label: '4:5', factor: 4 / 5 },
 ] as const;
 
 export const ASPECT_RATIO_OPTIONS_ILLUSTRATION = [
-  { value: '16:9' as const, label: 'Landscape (16:9)', factor: 16 / 9 },
-  { value: '1:1' as const, label: 'Square (1:1)', factor: 1 / 1 },
-  { value: '4:5' as const, label: 'Portrait (4:5)', factor: 4 / 5 },
+  { value: '16:9' as const, label: '16:9', factor: 16 / 9 },
+  { value: '1:1' as const, label: '1:1', factor: 1 / 1 },
+  { value: '4:5' as const, label: '4:5', factor: 4 / 5 },
 ] as const;
 
 export const QUALITY_OPTIONS = [

@@ -291,21 +291,6 @@ export default function ChatLanding() {
                   transition={transition}
                 >
                   <h1 className={styles.greeting}>{headline.greeting}</h1>
-                  <p className={styles.subgreetingCombined}>
-                    {effectiveMode === 'product' && (
-                      <>
-                        Add products with <kbd className={styles.hintKbd}>@</kbd>, pick a shot
-                        style — and optionally add a few words to guide the shot.
-                      </>
-                    )}
-                    {effectiveMode === 'character' && (
-                      <>
-                        Add characters with <kbd className={styles.hintKbd}>@</kbd>, pick a
-                        location — and optionally add a few words to guide the scene.
-                      </>
-                    )}
-                    {effectiveMode !== 'product' && effectiveMode !== 'character' && headline.sub}
-                  </p>
                 </motion.div>
                 <motion.div layoutId="chat-input" layout className={styles.landingInputWrap}>
                   <ChatInput onSend={handleSend} />
