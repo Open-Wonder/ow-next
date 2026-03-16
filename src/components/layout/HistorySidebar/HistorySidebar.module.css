@@ -340,7 +340,7 @@
 }
 
 .collectionItem:hover {
-  background: var(--color-white);
+  background: var(--color-gray-200);
   color: var(--color-black);
 }
 

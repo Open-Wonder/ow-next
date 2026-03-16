@@ -35,20 +35,22 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
   const handleModify = useCallback(
     (assetId: string, prompt: string) => {
       const original = state.currentSession?.generatedAssets.find((a) => a.id === assetId);
-      dispatch({
-        type: 'ADD_GENERATED_ASSET',
-        payload: {
-          id: `asset-mod-${Date.now()}`,
-          url: `https://picsum.photos/seed/mod${Date.now()}/600/600`,
-          prompt: `Modified: ${prompt}`,
-          type: 'image',
-          aspectRatio: original?.aspectRatio,
-          savedToLibrary: false,
-        },
-      });
       setModifyAssetId(null);
       setModifyPrompt('');
       setModifyAnchor(null);
+
+      const payload = {
+        id: `asset-mod-${Date.now()}`,
+        url: `https://picsum.photos/seed/mod${Date.now()}/600/600`,
+        prompt: `Modified: ${prompt}`,
+        type: 'image' as const,
+        aspectRatio: original?.aspectRatio,
+        savedToLibrary: false,
+      };
+
+      setTimeout(() => {
+        dispatch({ type: 'ADD_GENERATED_ASSET', payload });
+      }, 1200);
     },
     [dispatch, state.currentSession]
   );

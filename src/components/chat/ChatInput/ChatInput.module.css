@@ -1,5 +1,4 @@
-/* Flex column so input area stays at top, picker bar below – fixed heights prevent mode-switch jumping */
-/* Uses Box variant="white" for border/background (aligned with open-wonder PromptFloater) */
+/* Single wrapper: backdrop-filter + 80% white on outermost element for reliable blur */
 .wrapper {
   width: 100%;
   max-width: 960px;
@@ -8,24 +7,12 @@
   display: flex;
   flex-direction: column;
   border-radius: var(--radius);
-  background: transparent !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  backdrop-filter: blur(32px) saturate(180%);
 }
 
 .wrapper::after {
-  /* Disable Box masked outline layer (causes white corner artifacts here) */
-  display: none;
-}
-
-.glassLayer {
-  position: relative;
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.74);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  backdrop-filter: blur(14px) saturate(140%);
-}
-
-.glassLayer::after {
   content: "";
   pointer-events: none;
   position: absolute;

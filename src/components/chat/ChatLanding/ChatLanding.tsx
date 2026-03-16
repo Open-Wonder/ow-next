@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CaretLeft } from '@phosphor-icons/react';
@@ -227,6 +227,15 @@ export default function ChatLanding() {
     }, 1200);
   };
 
+  const imagineViewRef = useRef<HTMLDivElement>(null);
+  const imagineCanvasRef = useRef<HTMLDivElement>(null);
+
+  const clearBackdropRoot = useCallback((el: HTMLDivElement | null) => {
+    if (!el) return;
+    el.style.willChange = 'auto';
+    el.style.transform = 'none';
+  }, []);
+
   const fadeOut = { duration: 0.3, ease: [0.4, 0, 0.2, 1] as const };
   const fadeIn = { duration: 0.35, ease: [0.4, 0, 0.2, 1] as const };
   const fadeInDelayed = { duration: 0.35, ease: [0.4, 0, 0.2, 1] as const, delay: 0.5 };
@@ -237,12 +246,14 @@ export default function ChatLanding() {
         <AnimatePresence mode="wait">
           {hasImageSessionView ? (
             <motion.div
+              ref={imagineViewRef}
               key="activeImagine"
               className={`${styles.activeChat} ${styles.imagineView}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={fadeOut}
+              onAnimationComplete={() => clearBackdropRoot(imagineViewRef.current)}
             >
               {showFullViewportLoader && (
                 <div className={styles.generationLoaderFullViewport}>
@@ -250,10 +261,12 @@ export default function ChatLanding() {
                 </div>
               )}
               <motion.div
+                ref={imagineCanvasRef}
                 className={styles.imagineCanvasArea}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={fadeInDelayed}
+                onAnimationComplete={() => clearBackdropRoot(imagineCanvasRef.current)}
               >
                 <EditCanvas embedded />
               </motion.div>

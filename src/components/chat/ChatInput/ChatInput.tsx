@@ -182,9 +182,8 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
 
   return (
     <Box variant="white" noPadding className={cn(styles.wrapper, className)}>
-      <div className={styles.glassLayer}>
-        {/* Input area: inline tags + textarea */}
-        <div className={styles.inputArea}>
+      {/* Input area: inline tags + textarea */}
+      <div className={styles.inputArea}>
           {inlineTags.length > 0 && (
             <div className={styles.tagsRow}>
               {inlineTags.map((tag) => (
@@ -252,7 +251,6 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
             </div>
           </div>
         )}
-      </div>
     </Box>
   );
 }
@@ -306,7 +304,6 @@ function ImaginePickers({ createButton }: { createButton: React.ReactNode }) {
             }
             type="create"
             size="sm"
-            disabled={state.isGeneratingImages}
           />
         </div>
       </div>
@@ -365,7 +362,6 @@ function ProductPickers({ createButton }: { createButton: React.ReactNode }) {
             }
             type="create"
             size="sm"
-            disabled={state.isGeneratingImages}
           />
         </div>
       </div>
@@ -424,7 +420,6 @@ function CharacterPickers({ createButton }: { createButton: React.ReactNode }) {
             }
             type="create"
             size="sm"
-            disabled={state.isGeneratingImages}
           />
         </div>
       </div>

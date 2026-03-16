@@ -6,7 +6,7 @@ import {
   X,
   DownloadSimple,
   PencilSimple,
-  PaperPlaneRight,
+  ArrowUp,
 } from '@phosphor-icons/react';
 import { Button } from '@/components/common/Button';
 import styles from './AssetLightbox.module.css';
@@ -116,6 +116,7 @@ export default function AssetLightbox({
     onModify(currentAsset.id, trimmed);
     setShowModifyPanel(false);
     setModifyInputText('');
+    onClose();
   };
 
   const handleModifyBackdropClick = (e: React.MouseEvent) => {
@@ -219,7 +220,7 @@ export default function AssetLightbox({
                   size="sm"
                   type="submit"
                   disabled={!modifyInputText.trim()}
-                  icon={<PaperPlaneRight size={18} weight="bold" />}
+                  icon={<ArrowUp size={18} weight="bold" />}
                   className={styles.modifySendBtn}
                   classNames={{ inner: styles.modifySendBtnInner }}
                   aria-label="Apply"
