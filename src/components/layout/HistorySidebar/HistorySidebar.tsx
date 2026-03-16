@@ -162,8 +162,8 @@ export default function HistorySidebar() {
   };
 
   const slideTransition = {
-    type: 'tween',
-    ease: [0.25, 0.1, 0.25, 1],
+    type: 'tween' as const,
+    ease: [0.25, 0.1, 0.25, 1] as const,
     x: { duration: 0.22 },
     opacity: { duration: 0.06 },
   };
