@@ -14,6 +14,14 @@ export const metadata: Metadata = {
     default: 'Open Wonder',
   },
   description: 'Open Wonder — New Interface',
+  openGraph: {
+    title: 'Open Wonder',
+    description: 'Open Wonder — New Interface',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
 
 export default function RootLayout({
