@@ -78,8 +78,7 @@
   max-height: calc(90vh - 80px); /* Reserve space for buttons + 20px gap */
 }
 
-.assetImage,
-.assetVideo {
+.assetImage {
   max-width: 85vw;
   max-height: calc(90vh - 80px);
   object-fit: contain;

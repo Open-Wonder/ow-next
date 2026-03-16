@@ -1,137 +1,65 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  GearSix,
-  Palette,
-  Package,
-  UserCircle,
-  SignOut,
-  Swatches,
-} from '@phosphor-icons/react';
+import { GearSix, CaretRight, SignOut } from '@phosphor-icons/react';
 import Avatar from '@/components/common/Avatar';
 import { MOCK_USER } from '@/lib/mock-data';
-import { useIsAdmin } from '@/lib/permissions';
-import { useChat, ManagePanelType } from '@/lib/chat-context';
+import { useChat } from '@/lib/chat-context';
 import styles from './SidebarUserSection.module.css';
 
-interface MenuItemDef {
-  id: string;
-  label?: string;
-  icon?: React.ReactNode;
-  divider?: boolean;
-  danger?: boolean;
-  adminOnly?: boolean;
-  managePanel?: ManagePanelType;
+interface SidebarUserSectionProps {
+  hideSettingsButton?: boolean;
 }
 
-export default function SidebarUserSection() {
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const isAdmin = useIsAdmin();
+export default function SidebarUserSection({ hideSettingsButton }: SidebarUserSectionProps) {
   const router = useRouter();
-  const { dispatch } = useChat();
+  const { state, dispatch } = useChat();
 
-  const USER_MENU_ITEMS: MenuItemDef[] = useMemo(
-    () => [
-      { id: 'account', label: 'Account Settings', icon: <GearSix size={16} /> },
-      { id: 'brand', label: 'Brand Settings', icon: <Palette size={16} /> },
-      { id: 'divider-1', divider: true, adminOnly: true },
-      {
-        id: 'styles',
-        label: 'Image Styles',
-        icon: <Swatches size={16} />,
-        adminOnly: true,
-        managePanel: 'styles',
-      },
-      {
-        id: 'products',
-        label: 'Manage Products',
-        icon: <Package size={16} />,
-        adminOnly: true,
-        managePanel: 'products',
-      },
-      {
-        id: 'characters',
-        label: 'Manage Characters',
-        icon: <UserCircle size={16} />,
-        adminOnly: true,
-        managePanel: 'characters',
-      },
-      { id: 'divider-2', divider: true },
-      { id: 'logout', label: 'Sign Out', icon: <SignOut size={16} />, danger: true },
-    ],
-    []
-  );
+  const isSettingsActive = state.activeView === 'settings';
 
-  const visibleItems = useMemo(() => {
-    return USER_MENU_ITEMS.filter((item) => !item.adminOnly || isAdmin);
-  }, [USER_MENU_ITEMS, isAdmin]);
+  const handleSettingsClick = () => {
+    if (isSettingsActive) return;
+    dispatch({ type: 'OPEN_SETTINGS' });
+    router.push('/manage');
+  };
 
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setUserMenuOpen(false);
-      }
-    };
-    if (userMenuOpen) {
-      document.addEventListener('mousedown', handleClick);
-    }
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [userMenuOpen]);
-
-  const handleItemClick = (item: MenuItemDef) => {
-    setUserMenuOpen(false);
-    if (item.managePanel) {
-      dispatch({ type: 'SET_ACTIVE_VIEW', payload: 'manage' });
-      dispatch({ type: 'SET_MANAGE_PANEL', payload: item.managePanel });
-      router.push('/manage');
-    }
+  const handleLogout = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Sign out handler
   };
 
   return (
-    <div className={styles.userSection} ref={menuRef}>
-      <button
-        type="button"
-        className={styles.userTrigger}
-        onClick={() => setUserMenuOpen((o) => !o)}
-      >
-        <Avatar name={MOCK_USER.name} size="xl" />
-        <div className={styles.userInfo}>
-          <span className={styles.userName}>{MOCK_USER.name}</span>
-          <span className={styles.planTag}>{MOCK_USER.email}</span>
+    <div className={styles.userSection}>
+      {!hideSettingsButton ? (
+        <div className={styles.settingsBlock}>
+          <div className={styles.settingsDivider} />
+          <button
+            type="button"
+            className={`${styles.settingsButton} ${isSettingsActive ? styles.settingsButtonActive : ''}`}
+            onClick={handleSettingsClick}
+          >
+            <GearSix size={20} weight="regular" />
+            <span className={styles.settingsLabel}>Settings</span>
+            <CaretRight size={20} weight="regular" className={styles.settingsArrow} />
+          </button>
+          <div className={styles.settingsDivider} />
         </div>
-      </button>
-
-      {userMenuOpen && (
-        <div className={styles.userMenu}>
-          <div className={styles.menuHeader}>
-            <Avatar name={MOCK_USER.name} size="xl" />
-            <div className={styles.menuHeaderInfo}>
-              <span className={styles.menuHeaderName}>{MOCK_USER.name}</span>
-              <span className={styles.planTag}>{MOCK_USER.email}</span>
-            </div>
-          </div>
-          {visibleItems.map((item) =>
-            item.divider ? (
-              <div key={item.id} className={styles.menuDivider} />
-            ) : (
-              <button
-                key={item.id}
-                type="button"
-                className={
-                  item.danger ? styles.menuItemDanger : styles.menuItem
-                }
-                onClick={() => handleItemClick(item)}
-              >
-                {item.icon}
-                {item.label}
-              </button>
-            )
-          )}
-        </div>
+      ) : (
+        <div className={styles.settingsDivider} />
       )}
+
+      <div className={styles.userRow}>
+        <Avatar name={MOCK_USER.name} size="xs" />
+        <span className={styles.userName}>{MOCK_USER.name}</span>
+        <button
+          type="button"
+          className={styles.logoutBtn}
+          onClick={handleLogout}
+          aria-label="Sign out"
+        >
+          <SignOut size={20} />
+        </button>
+      </div>
     </div>
   );
 }

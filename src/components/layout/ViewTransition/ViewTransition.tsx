@@ -7,16 +7,16 @@ import styles from './ViewTransition.module.css';
 interface ViewTransitionProps {
   createView: React.ReactNode;
   libraryView: React.ReactNode;
-  manageView?: React.ReactNode;
+  settingsView?: React.ReactNode;
 }
 
 const fadeTransition = { duration: 0.12, ease: [0, 0, 0.2, 1] as const };
 
-export default function ViewTransition({ createView, libraryView, manageView }: ViewTransitionProps) {
+export default function ViewTransition({ createView, libraryView, settingsView }: ViewTransitionProps) {
   const { state } = useChat();
   const isCreate = state.activeView === 'create';
   const isLibrary = state.activeView === 'library';
-  const isManage = state.activeView === 'manage';
+  const isSettings = state.activeView === 'settings';
 
   return (
     <div className={styles.container}>
@@ -50,20 +50,20 @@ export default function ViewTransition({ createView, libraryView, manageView }: 
         {libraryView}
       </motion.div>
 
-      {/* Manage View – always mounted */}
-      {manageView && (
+      {/* Settings View – always mounted */}
+      {settingsView && (
         <motion.div
           className={styles.view}
           initial={{ opacity: 0 }}
-          animate={{ opacity: isManage ? 1 : 0 }}
+          animate={{ opacity: isSettings ? 1 : 0 }}
           transition={fadeTransition}
           style={{
-            pointerEvents: isManage ? 'auto' : 'none',
-            position: isManage ? 'relative' : 'absolute',
-            zIndex: isManage ? 1 : 0,
+            pointerEvents: isSettings ? 'auto' : 'none',
+            position: isSettings ? 'relative' : 'absolute',
+            zIndex: isSettings ? 1 : 0,
           }}
         >
-          {manageView}
+          {settingsView}
         </motion.div>
       )}
     </div>

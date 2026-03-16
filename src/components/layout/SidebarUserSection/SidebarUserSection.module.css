@@ -1,37 +1,81 @@
 .userSection {
-  position: relative;
   flex-shrink: 0;
-  padding: var(--spacing-sm) var(--spacing-2xs);
-  border-top: var(--border-default);
-  background: var(--color-gray-50);
+  padding: 0 var(--spacing-2xs);
+  background: var(--color-white);
 }
 
-.userTrigger {
+.settingsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.settingsDivider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 0 calc(-1 * var(--spacing-2xs));
+}
+
+.settingsButton {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
   width: 100%;
-  padding: var(--spacing-2xs) var(--spacing-sm);
+  height: 40px;
+  padding: 0 var(--spacing-sm);
+  margin: var(--spacing-sm) 0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-black);
+  background: transparent;
   border: none;
-  background: none;
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   cursor: pointer;
   text-align: left;
-  transition: background-color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
-.userTrigger:hover {
+.settingsButton svg:first-child {
+  color: var(--color-black);
+}
+
+.settingsButton:hover {
   background: var(--color-gray-100);
 }
 
-.userInfo {
+.settingsButtonActive {
+  background: var(--color-gray-100);
+}
+
+.settingsLabel {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settingsArrow {
+  flex-shrink: 0;
   display: flex;
-  flex-direction: column;
-  gap: 0;
-  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--color-black);
+}
+
+.userRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  /* Match settings block height: divider + margin + 40px button + margin + divider */
+  height: calc(2px + (2 * var(--spacing-sm)) + 40px);
+  padding: 0 var(--spacing-sm);
 }
 
 .userName {
+  flex: 1;
   font-size: 13px;
   font-weight: var(--font-weight-semibold);
   color: var(--color-black);
@@ -40,100 +84,22 @@
   text-overflow: ellipsis;
 }
 
-.planTag {
-  font-size: 10px;
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-500);
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.userMenu {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: var(--spacing-2xs);
-  right: var(--spacing-2xs);
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  z-index: 300;
-  padding: var(--spacing-3xs);
-  animation: menuFadeInUp 150ms ease-out;
-}
-
-@keyframes menuFadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.menuHeader {
+.logoutBtn {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  margin-bottom: var(--spacing-3xs);
-}
-
-.menuHeaderInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  min-width: 0;
-}
-
-.menuHeaderName {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-black);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.menuDivider {
-  height: 1px;
-  background: var(--color-dividerdefault);
-  margin: var(--spacing-3xs) var(--spacing-xs);
-}
-
-.menuItem,
-.menuItemDanger {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  width: 100%;
-  padding: var(--dimension-8) var(--dimension-12);
-  border-radius: var(--dimension-cornerroundings-xs-corner);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-  text-align: left;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border: none;
   background: none;
-}
-
-.menuItem {
-  color: var(--color-gray-700);
-}
-
-.menuItem:hover {
-  background: var(--color-button-text-hoverfill);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
   color: var(--color-black);
+  transition: background-color var(--transition-fast);
 }
 
-.menuItemDanger {
+.logoutBtn:hover {
+  background: var(--color-gray-100);
   color: var(--color-element-toast-error-text);
-}
-
-.menuItemDanger:hover {
-  background: var(--color-element-toast-error-fill);
 }

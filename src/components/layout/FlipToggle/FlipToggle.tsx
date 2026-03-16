@@ -7,8 +7,8 @@ import { useChat, ActiveView } from '@/lib/chat-context';
 import styles from './FlipToggle.module.css';
 
 const VIEWS: { id: ActiveView; label: string; href: string }[] = [
-  { id: 'create', label: 'Brand Assistant', href: '/' },
-  { id: 'library', label: 'Library', href: '/library' },
+  { id: 'create', label: 'Create', href: '/' },
+  { id: 'library', label: 'Explore', href: '/library' },
 ];
 
 export default function FlipToggle() {

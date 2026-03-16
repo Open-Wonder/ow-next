@@ -4,7 +4,6 @@ import cn from 'classnames';
 import {
   Heart,
   FolderSimplePlus,
-  VideoCamera,
   PencilSimple,
 } from '@phosphor-icons/react';
 import IconButton from '@/components/common/IconButton';
@@ -16,7 +15,6 @@ interface ImageCardProps {
   liked?: boolean;
   onLike?: () => void;
   onSaveToLibrary?: () => void;
-  onGenerateVideo?: () => void;
   onModify?: () => void;
 }
 
@@ -26,7 +24,6 @@ export default function ImageCard({
   liked = false,
   onLike,
   onSaveToLibrary,
-  onGenerateVideo,
   onModify,
 }: ImageCardProps) {
   return (
@@ -50,10 +47,6 @@ export default function ImageCard({
           <button className={styles.overlayBtn} onClick={onSaveToLibrary} title="Save to Library">
             <FolderSimplePlus size={16} />
             <span>Library</span>
-          </button>
-          <button className={styles.overlayBtn} onClick={onGenerateVideo} title="Generate Video">
-            <VideoCamera size={16} />
-            <span>Video</span>
           </button>
           <button className={styles.overlayBtn} onClick={onModify} title="Modify Image">
             <PencilSimple size={16} />

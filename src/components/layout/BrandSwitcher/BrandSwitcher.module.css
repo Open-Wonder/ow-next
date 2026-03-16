@@ -147,8 +147,9 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  padding: var(--spacing-2xs) var(--spacing-xs);
-  border-radius: var(--radius-xs);
+  width: 100%;
+  padding: var(--spacing-2xs) var(--spacing-md);
+  border-radius: 16px;
   cursor: pointer;
   transition: background-color var(--transition-fast);
   background: none;

@@ -51,7 +51,7 @@ function LibraryPanel() {
   );
 }
 
-function ManagePanel() {
+function SettingsPanel() {
   return (
     <div className={styles.libraryView}>
       <ManageListView />
@@ -76,7 +76,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
             <ViewTransition
               createView={<CreateView />}
               libraryView={<LibraryPanel />}
-              manageView={<ManagePanel />}
+              settingsView={<SettingsPanel />}
             />
           )}
         </div>

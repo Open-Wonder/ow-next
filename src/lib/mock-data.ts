@@ -98,7 +98,7 @@ export const MOCK_LIBRARY_ASSETS = Array.from({ length: 24 }, (_, i) => {
       'Packaging Design', 'Logo Exploration', 'Color Palette', 'Typography Sample',
       'Mood Board', 'Storyboard Frame', 'Print Ad', 'Billboard Mockup',
     ][i],
-    type: (i % 5 === 0 ? 'video' : 'image') as 'image' | 'video',
+    type: 'image' as const,
     folderId: MOCK_FOLDERS[i % MOCK_FOLDERS.length].id,
     styleId,
     liked: i % 4 === 0,

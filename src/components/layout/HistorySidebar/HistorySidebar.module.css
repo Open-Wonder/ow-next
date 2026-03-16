@@ -6,7 +6,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--color-gray-50);
+  background: var(--color-white);
 }
 
 .brandSection {
@@ -18,6 +18,24 @@
 }
 
 /* ── Session List ───────────────────────────────────────────────── */
+
+.listSlideWrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.listSlide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.listSlide .list {
+  height: 100%;
+}
 
 .list {
   flex: 1;
@@ -34,6 +52,13 @@
   letter-spacing: 0.1em;
   margin: 0 0 var(--spacing-sm);
   padding: 0 var(--spacing-xs);
+}
+
+.listHeadingTop {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin-bottom: var(--spacing-sm);
 }
 
 .empty {
@@ -181,11 +206,118 @@
   background: var(--color-gray-200);
 }
 
+/* ── Settings Navigation ────────────────────────────────────────────── */
+
+.settingsBackBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+  height: 40px;
+  margin-bottom: calc(var(--spacing-lg) + 20px);
+  padding: 0 var(--spacing-sm);
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black);
+  transition: background-color var(--transition-fast);
+  position: relative;
+}
+
+.settingsBackBtn:hover {
+  background: var(--color-gray-100);
+}
+
+.settingsBackIcon {
+  position: absolute;
+  left: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.settingsBackLabel {
+  /* Centered in full sidebar width */
+  width: 100%;
+  text-align: center;
+}
+
+.settingsSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.settingsSection:last-of-type {
+  margin-bottom: var(--spacing-lg);
+}
+
+.settingsSection .listHeading {
+  margin-top: 0;
+  margin-bottom: var(--spacing-sm);
+}
+
+.settingsSection:not(:first-of-type) .listHeading {
+  margin-top: var(--spacing-md);
+}
+
+.settingsItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+  height: 40px;
+  padding: 0 var(--spacing-sm);
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-black);
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.settingsItem svg {
+  color: var(--color-black);
+}
+
+.settingsItem:hover {
+  background: var(--color-gray-100);
+}
+
+.settingsItemActive {
+  background: var(--color-gray-100);
+}
+
+.settingsItemIndent {
+  padding-left: calc(var(--spacing-sm) + 20px + var(--spacing-xs));
+}
+
+.settingsItemDanger {
+  color: var(--color-element-toast-error-text);
+}
+
+.settingsItemDanger:hover {
+  background: var(--color-element-toast-error-fill);
+}
+
+.settingsLabel {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ── Collections (Library view) ─────────────────────────────────────── */
 
 .collectionSection {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-xs);
   padding: 0 var(--spacing-xs);
 }
 
@@ -194,7 +326,7 @@
   align-items: center;
   gap: 8px;
   padding: 7px 10px;
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   font-size: 13px;
   font-weight: var(--font-weight-medium);
   color: var(--color-gray-600);
@@ -233,7 +365,7 @@
 .collectionThumb {
   width: 24px;
   height: 24px;
-  border-radius: var(--radius-xs);
+  border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
 }

@@ -1,3 +1,251 @@
-{"sessionId":"9c5e95","location":"EditCanvas.tsx:175","message":"Lightbox open requested","data":{"index":0,"assetsLength":5,"hasHandleSave":"function"},"timestamp":1773417415727,"hypothesisId":"H1"}
-{"sessionId":"9c5e95","location":"EditCanvas.tsx:175","message":"Lightbox open requested","data":{"index":0,"assetsLength":5,"hasHandleSave":"function"},"timestamp":1773417545883,"hypothesisId":"H1"}
-{"sessionId":"9c5e95","location":"EditCanvas.tsx:175","message":"Lightbox open requested","data":{"index":1,"assetsLength":5,"hasHandleSave":"function"},"timestamp":1773417548552,"hypothesisId":"H1"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":false,"willOpen":true},"timestamp":1773667714779,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773667714784,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773667714784,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773667714798,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773667714798,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668363939,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668363959,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668364983,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668364983,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668365042,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668365042,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/library","willSet":"library"},"timestamp":1773668365052,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"library"},"timestamp":1773668365062,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"library"},"timestamp":1773668365062,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773668365065,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773668365065,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773668365100,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773668365100,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773668365157,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773668365157,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773668365170,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773668365170,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773668369478,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773668369478,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773668369489,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773668369489,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/","willSet":"create"},"timestamp":1773668369497,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773668369498,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773668369498,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668369508,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668369509,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668369521,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668369522,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":false,"willOpen":true},"timestamp":1773668370832,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773668370834,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773668370834,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773668370846,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773668370847,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668372783,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668372804,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668373304,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668373304,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668373315,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668373316,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/","willSet":"create"},"timestamp":1773668373327,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773668373328,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773668373328,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668373339,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668373339,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668373351,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668373352,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":false,"willOpen":true},"timestamp":1773668374497,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773668374505,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773668374505,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773668374519,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773668374519,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668397770,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668397792,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668398311,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773668398311,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668398327,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773668398326,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/library","willSet":"library"},"timestamp":1773668398336,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"library"},"timestamp":1773668398337,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"library"},"timestamp":1773668398338,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773668398340,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773668398340,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773668398351,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773668398351,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773668398373,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773668398374,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773668398386,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773668398386,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669039762,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669039780,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669040641,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669040642,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669040669,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669040669,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/library","willSet":"library"},"timestamp":1773669040682,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"library"},"timestamp":1773669040693,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"library"},"timestamp":1773669040693,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773669040698,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773669040698,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773669040723,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773669040723,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773669040777,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"library","isSettings":false,"hasSettingsView":true},"timestamp":1773669040777,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773669040803,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"library"},"timestamp":1773669040804,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":false,"willOpen":true},"timestamp":1773669045869,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669045873,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669045874,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"settings","isSettings":true,"hasSettingsView":true},"timestamp":1773669045881,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"settings","isSettings":true,"hasSettingsView":true},"timestamp":1773669045881,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669045891,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669045891,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669046178,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669046178,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/manage","willSet":"settings"},"timestamp":1773669046195,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669046196,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669046196,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669046204,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669046204,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669047297,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669047297,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669047297,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669047298,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669047314,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669047315,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669047464,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669047464,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669047481,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669047482,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/","willSet":"create"},"timestamp":1773669047503,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669047506,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669047506,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669047516,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669047516,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669047524,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669047524,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":false,"willOpen":true},"timestamp":1773669048404,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669048406,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669048406,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"settings","isSettings":true,"hasSettingsView":true},"timestamp":1773669048412,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"settings","isSettings":true,"hasSettingsView":true},"timestamp":1773669048413,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669048422,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669048422,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669048452,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669048452,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/manage","willSet":"settings"},"timestamp":1773669048462,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669048462,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669048463,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669048466,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669048467,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":true,"willOpen":false},"timestamp":1773669055743,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669055745,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669055745,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669055759,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669055760,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669055801,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669055801,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669055813,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669055814,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/","willSet":"create"},"timestamp":1773669055829,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669055830,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669055830,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669055840,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669055840,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669055848,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669055848,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":false,"willOpen":true},"timestamp":1773669056609,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669056611,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669056611,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"settings","isSettings":true,"hasSettingsView":true},"timestamp":1773669056618,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"settings","isSettings":true,"hasSettingsView":true},"timestamp":1773669056618,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669056630,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669056631,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669056660,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669056660,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/manage","willSet":"settings"},"timestamp":1773669056671,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669056672,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669056672,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669056675,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669056676,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":true,"willOpen":false},"timestamp":1773669057592,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669057593,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669057593,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669057600,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669057601,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669057657,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669057657,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669057668,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669057669,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/","willSet":"create"},"timestamp":1773669057680,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669057681,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669057681,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669057687,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"create","isSettings":false,"hasSettingsView":true},"timestamp":1773669057688,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669057696,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669057696,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":false,"willOpen":true},"timestamp":1773669058289,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669058291,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669058291,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"settings","isSettings":true,"hasSettingsView":true},"timestamp":1773669058296,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ViewTransition.tsx:render","message":"ViewTransition","data":{"activeView":"settings","isSettings":true,"hasSettingsView":true},"timestamp":1773669058296,"hypothesisId":"h3"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669058304,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669058304,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669058332,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669058332,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:urlSync","message":"URL sync effect","data":{"pathname":"/manage","willSet":"settings"},"timestamp":1773669058343,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669058343,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669058344,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669058349,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669058349,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":true,"willOpen":false},"timestamp":1773669060362,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669060365,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669060365,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669060375,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669060376,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"SidebarUserSection.tsx:handleClick","message":"Settings click","data":{"isSettingsActive":false,"willOpen":true},"timestamp":1773669061073,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669061076,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669061076,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669061081,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669061081,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669063181,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669063182,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669063194,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669063195,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"settings"},"timestamp":1773669063203,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"settings"},"timestamp":1773669063203,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669067158,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669067159,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669067184,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669067185,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669068751,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669068751,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669068768,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669068769,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669069614,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669069614,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669069638,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669069639,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669070141,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669070141,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669070146,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669070146,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669070850,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669070850,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669070871,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669070871,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669071435,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669071436,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669071442,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669071443,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669072127,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669072128,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669072151,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669072152,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669072567,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669072567,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669072573,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669072573,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669073232,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"create"},"timestamp":1773669073232,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669073245,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"styles","activeView":"create"},"timestamp":1773669073246,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669073789,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"chat-context.tsx:reducer","message":"SET_ACTIVE_VIEW","data":{"payload":"settings"},"timestamp":1773669073789,"hypothesisId":"h1"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669073795,"hypothesisId":"h2"}
+{"sessionId":"9c5e95","location":"ManageListView.tsx:render","message":"ManageListView render","data":{"panel":"account","activeView":"settings"},"timestamp":1773669073795,"hypothesisId":"h2"}

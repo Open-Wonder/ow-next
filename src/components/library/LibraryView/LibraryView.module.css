@@ -28,41 +28,49 @@
   flex-shrink: 0;
 }
 
-/* Search bar – visual style from open-wonder Image Libraries */
+/* Search bar – OW input look: white bg, gray outline, pill shape, subtle shadow */
 .searchWrap {
   position: relative;
   flex: 1;
-  max-width: 280px;
-  height: 40px;
+  max-width: 480px;
+  min-height: 40px;
   display: flex;
   align-items: center;
-  background: var(--color-gray-100);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  transition: box-shadow var(--transition-fast);
+  gap: 6px;
+  padding: 6px var(--spacing-md) 6px 10px;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-full);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .searchWrap:focus-within {
-  box-shadow: inset 0 0 0 2px var(--color-purplish-blue);
+  border-color: var(--color-gray-400);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .searchIcon {
-  position: absolute;
-  left: var(--spacing-md);
-  top: 50%;
-  transform: translateY(-50%);
   color: var(--color-gray-500);
   pointer-events: none;
   flex-shrink: 0;
 }
 
+.searchTagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
 .searchInput {
-  width: 100%;
-  height: 100%;
-  padding: 0 var(--spacing-md);
-  padding-left: calc(var(--spacing-md) + 20px);
+  flex: 1;
+  min-width: 80px;
+  height: 28px;
+  padding: 0;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-normal);
   line-height: var(--line-height-normal);
@@ -74,6 +82,59 @@
 
 .searchInput::placeholder {
   color: var(--color-gray-500);
+}
+
+/* Product tags – same look as ChatInput prompt tags */
+.searchTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 5px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  background: var(--color-gray-200);
+  color: var(--color-black);
+  animation: searchTagIn 200ms ease-out;
+}
+
+@keyframes searchTagIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.searchTagImage {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.searchTagRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.5;
+  color: inherit;
+  transition: opacity var(--transition-fast);
+}
+
+.searchTagRemove:hover {
+  opacity: 1;
 }
 
 /* Action menu (replaces density toggle) */
@@ -191,10 +252,11 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(4px);
   color: var(--color-gray-500);
+  border: none;
   cursor: pointer;
   transition: all var(--transition-fast);
   margin-left: auto;

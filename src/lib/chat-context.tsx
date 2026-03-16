@@ -7,8 +7,17 @@ import { MOCK_LIBRARY_ASSETS } from '@/lib/mock-data';
 // ── Types ──────────────────────────────────────────────────────────────
 
 export type CreativeMode = 'idle' | 'imagine' | 'product' | 'character' | 'create' | 'assistant';
-export type ActiveView = 'create' | 'library' | 'manage';
+export type ActiveView = 'create' | 'library' | 'manage' | 'settings';
 export type OutputType = 'image' | 'video';
+export type SettingsPanelType =
+  | 'account'
+  | 'brand'
+  | 'styles'
+  | 'products'
+  | 'product-styles'
+  | 'characters'
+  | 'character-locations'
+  | null;
 
 export interface ChatMessage {
   id: string;
@@ -101,6 +110,10 @@ export interface ChatState {
   generatingSessionId: string | null;
   /** Session IDs that completed generation but user hasn't opened them yet (green dot). */
   unseenCompletedSessionIds: Set<string>;
+  /** Which settings panel is active when activeView is 'settings'. */
+  activeSettingsPanel: SettingsPanelType;
+  /** View to restore when closing settings (create or library). */
+  viewBeforeSettings: 'create' | 'library';
 }
 
 // ── Actions ────────────────────────────────────────────────────────────
@@ -134,7 +147,10 @@ type ChatAction =
   | { type: 'SET_ACTIVE_LIBRARY_COLLECTION'; payload: string }
   | { type: 'TOGGLE_LIKED_ASSET'; payload: string }
   | { type: 'DELETE_SESSION'; payload: string }
-  | { type: 'CLEAR_ALL_SESSIONS' };
+  | { type: 'CLEAR_ALL_SESSIONS' }
+  | { type: 'SET_SETTINGS_PANEL'; payload: SettingsPanelType }
+  | { type: 'OPEN_SETTINGS' }
+  | { type: 'CLOSE_SETTINGS' };
 
 // ── Initial State ──────────────────────────────────────────────────────
 
@@ -172,6 +188,8 @@ const initialState: ChatState = {
   likedAssetIds: new Set(MOCK_LIBRARY_ASSETS.filter((a) => a.liked).map((a) => a.id)),
   generatingSessionId: null,
   unseenCompletedSessionIds: new Set(),
+  activeSettingsPanel: null,
+  viewBeforeSettings: 'create',
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -206,6 +224,23 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
   switch (action.type) {
     case 'SET_ACTIVE_VIEW':
       return { ...state, activeView: action.payload };
+
+    case 'OPEN_SETTINGS': {
+      const from = state.activeView === 'library' ? 'library' : 'create';
+      return {
+        ...state,
+        activeView: 'settings',
+        activeSettingsPanel: 'account',
+        viewBeforeSettings: from,
+      };
+    }
+
+    case 'CLOSE_SETTINGS':
+      return {
+        ...state,
+        activeView: state.viewBeforeSettings,
+        activeSettingsPanel: null,
+      };
 
     case 'SET_ACTIVE_LIBRARY_COLLECTION':
       return { ...state, activeLibraryCollection: action.payload };
@@ -494,6 +529,9 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'SET_MANAGE_PANEL':
       return { ...state, activeManagePanel: action.payload };
 
+    case 'SET_SETTINGS_PANEL':
+      return { ...state, activeSettingsPanel: action.payload };
+
     case 'SET_MANAGER_MODAL':
       return { ...state, activeManagerModal: action.payload };
 
@@ -551,7 +589,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     } else if (pathname === '/') {
       dispatch({ type: 'SET_ACTIVE_VIEW', payload: 'create' });
     } else if (pathname === '/manage' || pathname?.startsWith('/manage/')) {
-      dispatch({ type: 'SET_ACTIVE_VIEW', payload: 'manage' });
+      dispatch({ type: 'SET_ACTIVE_VIEW', payload: 'settings' });
     }
   }, [pathname]);
 

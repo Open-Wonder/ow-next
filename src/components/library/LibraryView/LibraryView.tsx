@@ -7,11 +7,11 @@ import {
   Heart,
   MagnifyingGlass,
   DotsThree,
-  VideoCamera,
   DownloadSimple,
   Trash,
   PencilSimple,
   PaperPlaneRight,
+  X,
 } from '@phosphor-icons/react';
 import cn from 'classnames';
 import {
@@ -20,8 +20,8 @@ import {
   MOCK_PRODUCT_STYLES,
 } from '@/lib/mock-data';
 import ContextMenu, { type MenuItem } from '@/components/common/ContextMenu/ContextMenu';
-import IconButton from '@/components/common/IconButton';
-import CustomSelect from '@/components/common/Select';
+import { Button } from '@/components/common/Button';
+import MentionPopover, { type MentionProduct } from '@/components/chat/ChatInput/MentionPopover';
 import AssetLightbox from '@/components/chat/AssetLightbox/AssetLightbox';
 import { useChat } from '@/lib/chat-context';
 import styles from './LibraryView.module.css';
@@ -33,6 +33,9 @@ export default function LibraryView() {
   const styleFilter = state.activeLibraryCollection;
   const [productFilter, setProductFilter] = useState('');
   const [search, setSearch] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [productPopoverSelectedIndex, setProductPopoverSelectedIndex] = useState(0);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
   const [actionMenuPosition, setActionMenuPosition] = useState({ x: 0, y: 0 });
   const actionMenuTriggerRef = useRef<HTMLButtonElement>(null);
@@ -97,6 +100,51 @@ export default function LibraryView() {
 
     return result;
   }, [styleFilter, search, likedIds, productFilter]);
+
+  const isProductCollection = MOCK_PRODUCT_STYLES.some((s) => s.id === styleFilter);
+  const productPopoverOpen = isProductCollection && searchFocused;
+
+  const productMentionItems: MentionProduct[] = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    return MOCK_PRODUCTS.filter((p) => p.name.toLowerCase().includes(q)).map((p) => ({
+      type: 'product' as const,
+      id: p.id,
+      name: p.name,
+      image: p.image,
+    }));
+  }, [search]);
+
+  useEffect(() => {
+    setProductPopoverSelectedIndex(0);
+  }, [productMentionItems]);
+
+  const getProductPopoverPosition = () => {
+    if (!searchWrapRef.current) return { top: 0, left: 0 };
+    const rect = searchWrapRef.current.getBoundingClientRect();
+    return { top: rect.bottom + 4, left: rect.left };
+  };
+
+  const closeProductPopover = () => setSearchFocused(false);
+
+  const handleProductPopoverKeyDown = (e: React.KeyboardEvent) => {
+    if (!productPopoverOpen || productMentionItems.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setProductPopoverSelectedIndex((i) => Math.min(i + 1, productMentionItems.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setProductPopoverSelectedIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const item = productMentionItems[productPopoverSelectedIndex];
+      if (item) {
+        setProductFilter(item.id);
+        closeProductPopover();
+      }
+    }
+  };
+
+  const selectedProduct = productFilter ? MOCK_PRODUCTS.find((p) => p.id === productFilter) : null;
 
   const handleContextMenu = (e: React.MouseEvent, assetId: string) => {
     e.preventDefault();
@@ -237,47 +285,69 @@ export default function LibraryView() {
       <main className={styles.main}>
         {/* Header */}
         <div className={styles.mainHeader}>
-          <div className={styles.searchWrap}>
-            <MagnifyingGlass size={16} className={styles.searchIcon} />
+          <div ref={searchWrapRef} className={styles.searchWrap}>
+            <MagnifyingGlass size={20} weight="regular" className={styles.searchIcon} />
+            {selectedProduct && (
+              <div className={styles.searchTagsRow}>
+                <span className={styles.searchTag}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={selectedProduct.image} alt="" className={styles.searchTagImage} />
+                  {selectedProduct.name}
+                  <button
+                    type="button"
+                    className={styles.searchTagRemove}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setProductFilter('');
+                    }}
+                    aria-label="Remove product filter"
+                  >
+                    <X size={10} />
+                  </button>
+                </span>
+              </div>
+            )}
             <input
               className={styles.searchInput}
               placeholder="Search assets..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setTimeout(() => setSearchFocused(false), 150)}
+              onKeyDown={handleProductPopoverKeyDown}
             />
           </div>
 
-          {/* Product filter within product style collection */}
-          {MOCK_PRODUCT_STYLES.some((s) => s.id === styleFilter) && (
-            <div className={styles.filterChips}>
-              <CustomSelect
-                id="library-product-filter"
-                value={productFilter}
-                onValueChange={setProductFilter}
-                options={[
-                  { value: '', label: 'All' },
-                  ...MOCK_PRODUCTS.map((p) => ({ value: p.id, label: p.name, imageUrl: p.image })),
-                ]}
-                placeholder="Product · All"
-                triggerPrefix="Product · "
-                size="sm"
-                className={styles.filterSelect}
-              />
-            </div>
-          )}
+          {productPopoverOpen &&
+            typeof document !== 'undefined' &&
+            createPortal(
+              <MentionPopover
+                items={productMentionItems}
+                selectedIndex={productPopoverSelectedIndex}
+                onSelect={(item) => {
+                  setProductFilter(item.id);
+                  closeProductPopover();
+                }}
+                onClose={closeProductPopover}
+                position={getProductPopoverPosition()}
+                query={search}
+                onQueryChange={setSearch}
+                showSearch={false}
+              />,
+              document.body
+            )}
 
           {/* Action menu */}
           <div className={styles.actionMenuWrap}>
-            <IconButton
+            <Button
               ref={actionMenuTriggerRef}
-              variant="filled"
+              variant="secondary"
               size="md"
+              icon={<DotsThree size={20} />}
               onClick={openActionMenu}
               aria-label="Style actions"
               aria-expanded={actionMenuOpen}
-            >
-              <DotsThree size={20} />
-            </IconButton>
+            />
             {typeof document !== 'undefined' &&
               actionMenuOpen &&
               createPortal(
@@ -322,12 +392,6 @@ export default function LibraryView() {
                   />
                   <div className={styles.masonryOverlay}>
                     <div className={styles.masonryTopRow}>
-                      {asset.type === 'video' && (
-                        <span className={styles.typeBadge}>
-                          <VideoCamera size={11} />
-                          Video
-                        </span>
-                      )}
                       <button
                         className={cn(
                           styles.heartBtn,
@@ -412,18 +476,23 @@ export default function LibraryView() {
           document.body
         )}
 
-      {/* Lightbox */}
-      <AnimatePresence>
-        {lightboxIndex !== null && lightboxAssets.length > 0 && (
-          <AssetLightbox
-            assets={lightboxAssets}
-            initialIndex={lightboxIndex}
-            onClose={() => setLightboxIndex(null)}
-            onModify={() => {}}
-            onSaveToLibrary={() => {}}
-          />
+      {/* Lightbox (portaled so it appears above TopBar and all content) */}
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {lightboxIndex !== null && lightboxAssets.length > 0 && (
+              <AssetLightbox
+                key="lightbox"
+                assets={lightboxAssets}
+                initialIndex={lightboxIndex}
+                onClose={() => setLightboxIndex(null)}
+                onModify={() => {}}
+                onSaveToLibrary={() => {}}
+              />
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
     </div>
   );
 }

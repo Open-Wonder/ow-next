@@ -161,20 +161,12 @@ export default function AssetLightbox({
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
               >
-                {currentAsset.type === 'image' ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={currentAsset.url}
-                    alt={currentAsset.prompt}
-                    className={styles.assetImage}
-                  />
-                ) : (
-                  <video
-                    src={currentAsset.url}
-                    controls
-                    className={styles.assetVideo}
-                  />
-                )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={currentAsset.url}
+                  alt={currentAsset.prompt}
+                  className={styles.assetImage}
+                />
               </motion.div>
             </AnimatePresence>
           </div>

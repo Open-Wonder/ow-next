@@ -34,6 +34,14 @@
   mask-composite: intersect;
 }
 
+.xs {
+  width: 20px;
+  height: 20px;
+  --radius: 50%;
+  --border: 1px;
+  font-size: 10px;
+}
+
 .sm {
   width: 32px;
   height: 32px;
