@@ -40,7 +40,7 @@ export default function SidebarUserSection({ hideSettingsButton }: SidebarUserSe
           >
             <GearSix size={20} weight="regular" />
             <span className={styles.settingsLabel}>Settings</span>
-            <CaretRight size={20} weight="regular" className={styles.settingsArrow} />
+            <CaretRight size={14} weight="bold" className={styles.settingsArrow} />
           </button>
           <div className={styles.settingsDivider} />
         </div>
