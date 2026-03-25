@@ -16,11 +16,15 @@ import {
 import cn from 'classnames';
 import { useChat, CreativeMode, ChatSession, SettingsPanelType } from '@/lib/chat-context';
 import {
-  MOCK_BRAND_STYLES,
   MOCK_IMAGE_STYLES,
+  LIBRARY_BRAND_STYLES_ALL_ID,
+  LIBRARY_SIDEBAR_PRODUCT_STYLES,
+  MOCK_LIBRARY_COLLECTIONS,
   MOCK_PRODUCT_STYLES,
   MOCK_LIBRARY_ASSETS,
+  isLibraryAssetInBrandStylesSidebar,
 } from '@/lib/mock-data';
+import { getCollectionIdsForAsset } from '@/lib/library-collections';
 import { useIsAdmin } from '@/lib/permissions';
 import BrandSwitcher from '@/components/layout/BrandSwitcher/BrandSwitcher';
 import SidebarUserSection from '@/components/layout/SidebarUserSection/SidebarUserSection';
@@ -96,16 +100,12 @@ export default function HistorySidebar() {
   const { state, dispatch } = useChat();
   const isAdmin = useIsAdmin();
 
-  // Default to first image style when switching to library
+  // Default to "All" (Brand Styles) when switching to library
   useEffect(() => {
-    if (
-      state.activeView === 'library' &&
-      !state.activeLibraryCollection &&
-      MOCK_IMAGE_STYLES[0]
-    ) {
+    if (state.activeView === 'library' && !state.activeLibraryCollection) {
       dispatch({
         type: 'SET_ACTIVE_LIBRARY_COLLECTION',
-        payload: MOCK_IMAGE_STYLES[0].id,
+        payload: LIBRARY_BRAND_STYLES_ALL_ID,
       });
     }
   }, [state.activeView, state.activeLibraryCollection, dispatch]);
@@ -128,12 +128,28 @@ export default function HistorySidebar() {
       ? 'No previous conversations'
       : `No ${MODE_LABELS[state.mode].toLowerCase()} conversations yet`;
 
-  // Collection counts (liked assets per style)
+  // Collection counts (liked assets per style / named collection)
   const collectionCounts = Object.fromEntries(
-    [...MOCK_IMAGE_STYLES, ...MOCK_PRODUCT_STYLES].map((s) => [s.id, 0])
-  );
+    [
+      LIBRARY_BRAND_STYLES_ALL_ID,
+      ...MOCK_IMAGE_STYLES.map((s) => s.id),
+      ...MOCK_PRODUCT_STYLES.map((s) => s.id),
+      ...MOCK_LIBRARY_COLLECTIONS.map((c) => c.id),
+      ...state.userLibraryCollections.map((c) => c.id),
+    ].map((id) => [id, 0])
+  ) as Record<string, number>;
   for (const asset of MOCK_LIBRARY_ASSETS) {
     if (!state.likedAssetIds.has(asset.id)) continue;
+    if (isLibraryAssetInBrandStylesSidebar(asset)) {
+      collectionCounts[LIBRARY_BRAND_STYLES_ALL_ID] =
+        (collectionCounts[LIBRARY_BRAND_STYLES_ALL_ID] ?? 0) + 1;
+    }
+    for (const cid of getCollectionIdsForAsset(
+      asset.id,
+      state.assetCollectionMembership
+    )) {
+      collectionCounts[cid] = (collectionCounts[cid] ?? 0) + 1;
+    }
     if (asset.styleId === 'style-3' && 'productStyleId' in asset) {
       const id = asset.productStyleId as string;
       collectionCounts[id] = (collectionCounts[id] ?? 0) + 1;
@@ -143,8 +159,7 @@ export default function HistorySidebar() {
     }
   }
 
-  const imageStyles = MOCK_BRAND_STYLES.filter((s) => s.isImageStyle !== false);
-  const productStyles = MOCK_PRODUCT_STYLES.slice(0, 3);
+  const brandStyleRows = [...MOCK_IMAGE_STYLES, ...LIBRARY_SIDEBAR_PRODUCT_STYLES];
 
   const showCollections = state.activeView === 'library';
   const showHistory = state.activeView === 'create';
@@ -176,8 +191,23 @@ export default function HistorySidebar() {
 
       {showCollections && (
         <div className={styles.list}>
+          <h3 className={cn(styles.listHeading, styles.listHeadingTop)}>Brand Styles</h3>
           <div className={styles.collectionSection}>
-            {imageStyles.map((style) => (
+            <button
+              type="button"
+              className={cn(
+                styles.collectionItem,
+                state.activeLibraryCollection === LIBRARY_BRAND_STYLES_ALL_ID &&
+                  styles.collectionItemActive
+              )}
+              onClick={() => handleCollectionSelect(LIBRARY_BRAND_STYLES_ALL_ID)}
+            >
+              <span className={styles.collectionLabel}>All</span>
+              <span className={styles.collectionCount}>
+                {collectionCounts[LIBRARY_BRAND_STYLES_ALL_ID] ?? 0}
+              </span>
+            </button>
+            {brandStyleRows.map((style) => (
               <button
                 key={style.id}
                 className={cn(
@@ -195,24 +225,28 @@ export default function HistorySidebar() {
                 </span>
               </button>
             ))}
-            {productStyles.map((style) => (
-              <button
-                key={style.id}
-                className={cn(
-                  styles.collectionItem,
-                  state.activeLibraryCollection === style.id &&
-                    styles.collectionItemActive
-                )}
-                onClick={() => handleCollectionSelect(style.id)}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={style.image} alt="" className={styles.collectionThumb} />
-                <span className={styles.collectionLabel}>{style.name}</span>
-                <span className={styles.collectionCount}>
-                  {collectionCounts[style.id] ?? 0}
-                </span>
-              </button>
-            ))}
+          </div>
+          <h3 className={cn(styles.listHeading, styles.listHeadingSection)}>Collections</h3>
+          <div className={styles.collectionSection}>
+            {[...MOCK_LIBRARY_COLLECTIONS, ...state.userLibraryCollections].map(
+              (collection) => (
+                <button
+                  key={collection.id}
+                  type="button"
+                  className={cn(
+                    styles.collectionItem,
+                    state.activeLibraryCollection === collection.id &&
+                      styles.collectionItemActive
+                  )}
+                  onClick={() => handleCollectionSelect(collection.id)}
+                >
+                  <span className={styles.collectionLabel}>{collection.name}</span>
+                  <span className={styles.collectionCount}>
+                    {collectionCounts[collection.id] ?? 0}
+                  </span>
+                </button>
+              )
+            )}
           </div>
         </div>
       )}

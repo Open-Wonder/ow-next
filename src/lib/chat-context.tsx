@@ -3,6 +3,7 @@
 import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { MOCK_LIBRARY_ASSETS } from '@/lib/mock-data';
+import { getCollectionIdsForAsset } from '@/lib/library-collections';
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -106,10 +107,18 @@ export interface ChatState {
   activeLibraryCollection: string;
   /** Asset IDs that are liked (in library). */
   likedAssetIds: Set<string>;
+  /** User-created library collections (sidebar + Add to Collection). */
+  userLibraryCollections: { id: string; name: string }[];
+  /** Per-asset list of collection IDs (overrides mock `libraryCollectionId` when set). */
+  assetCollectionMembership: Record<string, string[]>;
   /** Session ID currently generating images. */
   generatingSessionId: string | null;
   /** Session IDs that completed generation but user hasn't opened them yet (green dot). */
   unseenCompletedSessionIds: Set<string>;
+  /** Library assets currently generating HD upscale. */
+  hdGeneratingAssetIds: Set<string>;
+  /** Library assets with HD version available. */
+  hdReadyAssetIds: Set<string>;
   /** Which settings panel is active when activeView is 'settings'. */
   activeSettingsPanel: SettingsPanelType;
   /** View to restore when closing settings (create or library). */
@@ -146,6 +155,13 @@ type ChatAction =
   | { type: 'SET_GENERATING_IMAGES'; payload: boolean }
   | { type: 'SET_ACTIVE_LIBRARY_COLLECTION'; payload: string }
   | { type: 'TOGGLE_LIKED_ASSET'; payload: string }
+  | {
+      type: 'ADD_USER_LIBRARY_COLLECTION';
+      payload: { name: string; assetIdToAdd?: string };
+    }
+  | { type: 'TOGGLE_ASSET_LIBRARY_COLLECTION'; payload: { assetId: string; collectionId: string } }
+  | { type: 'START_HD_GENERATION'; payload: string }
+  | { type: 'COMPLETE_HD_GENERATION'; payload: string }
   | { type: 'DELETE_SESSION'; payload: string }
   | { type: 'CLEAR_ALL_SESSIONS' }
   | { type: 'SET_SETTINGS_PANEL'; payload: SettingsPanelType }
@@ -186,8 +202,12 @@ const initialState: ChatState = {
   pendingModifyPrompt: null,
   activeLibraryCollection: '',
   likedAssetIds: new Set(MOCK_LIBRARY_ASSETS.filter((a) => a.liked).map((a) => a.id)),
+  userLibraryCollections: [],
+  assetCollectionMembership: {},
   generatingSessionId: null,
   unseenCompletedSessionIds: new Set(),
+  hdGeneratingAssetIds: new Set(),
+  hdReadyAssetIds: new Set(),
   activeSettingsPanel: null,
   viewBeforeSettings: 'create',
 };
@@ -251,6 +271,62 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return { ...state, likedAssetIds: next };
+    }
+
+    case 'ADD_USER_LIBRARY_COLLECTION': {
+      const newId = `collection-user-${Date.now()}`;
+      const { name, assetIdToAdd } = action.payload;
+      let nextMembership = { ...state.assetCollectionMembership };
+      if (assetIdToAdd) {
+        const current = getCollectionIdsForAsset(assetIdToAdd, nextMembership);
+        nextMembership = {
+          ...nextMembership,
+          [assetIdToAdd]: [...current, newId],
+        };
+      }
+      return {
+        ...state,
+        userLibraryCollections: [
+          ...state.userLibraryCollections,
+          { id: newId, name },
+        ],
+        assetCollectionMembership: nextMembership,
+      };
+    }
+
+    case 'TOGGLE_ASSET_LIBRARY_COLLECTION': {
+      const { assetId, collectionId } = action.payload;
+      const current = getCollectionIdsForAsset(assetId, state.assetCollectionMembership);
+      const nextIds = current.includes(collectionId)
+        ? current.filter((id) => id !== collectionId)
+        : [...current, collectionId];
+      return {
+        ...state,
+        assetCollectionMembership: {
+          ...state.assetCollectionMembership,
+          [assetId]: nextIds,
+        },
+      };
+    }
+
+    case 'START_HD_GENERATION': {
+      const assetId = action.payload;
+      const nextGen = new Set(state.hdGeneratingAssetIds);
+      nextGen.add(assetId);
+      return { ...state, hdGeneratingAssetIds: nextGen };
+    }
+
+    case 'COMPLETE_HD_GENERATION': {
+      const assetId = action.payload;
+      const nextGen = new Set(state.hdGeneratingAssetIds);
+      nextGen.delete(assetId);
+      const nextReady = new Set(state.hdReadyAssetIds);
+      nextReady.add(assetId);
+      return {
+        ...state,
+        hdGeneratingAssetIds: nextGen,
+        hdReadyAssetIds: nextReady,
+      };
     }
 
     case 'DELETE_SESSION': {

@@ -58,7 +58,16 @@
   display: flex;
   align-items: center;
   height: 40px;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: 4px;
+}
+
+/* Secondary section title (e.g. Collections below Brand Styles) */
+.listHeadingSection {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin-top: var(--spacing-xl);
+  margin-bottom: 4px;
 }
 
 .empty {
@@ -317,7 +326,7 @@
 .collectionSection {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 4px;
   padding: 0 var(--spacing-xs);
 }
 
@@ -325,7 +334,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 10px;
+  padding: 7px var(--spacing-sm);
   border-radius: 12px;
   font-size: 13px;
   font-weight: var(--font-weight-medium);

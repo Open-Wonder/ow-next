@@ -84,9 +84,17 @@ const PRODUCT_STYLE_IDS = ['pstyle-1', 'pstyle-2', 'pstyle-3', 'pstyle-4', 'psty
 const CHARACTER_IDS = ['char-1', 'char-2', 'char-3', 'char-4', 'char-5', 'char-6'] as const;
 const LOCATION_IDS = ['cloc-1', 'cloc-2', 'cloc-3', 'cloc-4', 'cloc-5'] as const;
 
+/** Named campaign collections (library sidebar + filtering). */
+export const MOCK_LIBRARY_COLLECTIONS = [
+  { id: 'collection-summer-campaign', name: 'Summer Campaign' },
+  { id: 'collection-product-release-march', name: 'Product Release March' },
+] as const;
+
 export const MOCK_LIBRARY_ASSETS = Array.from({ length: 24 }, (_, i) => {
   const arIdx = i % ASPECT_RATIOS_LIB.length;
   const styleId = STYLE_IDS[i % STYLE_IDS.length];
+  const libraryCollectionId =
+    MOCK_LIBRARY_COLLECTIONS[i % MOCK_LIBRARY_COLLECTIONS.length].id;
   const base = {
     id: `asset-${i + 1}`,
     url: `https://picsum.photos/seed/lib${i + 1}/${WIDTHS[arIdx]}/${HEIGHTS[arIdx]}`,
@@ -107,6 +115,7 @@ export const MOCK_LIBRARY_ASSETS = Array.from({ length: 24 }, (_, i) => {
     createdAt: new Date(
       Date.now() - Math.floor(i / 4) * 86400000 - (i % 4) * 7200000
     ).toISOString(),
+    libraryCollectionId,
   };
   if (styleId === 'style-3') {
     return {
@@ -297,6 +306,29 @@ export const MOCK_PRODUCT_STYLES = [
     ],
   },
 ];
+
+/** Library sidebar: same three product-style rows as HistorySidebar (Studio / Outside / Lifestyle). */
+export const LIBRARY_SIDEBAR_PRODUCT_STYLES = MOCK_PRODUCT_STYLES.slice(0, 3);
+
+/** Library sidebar "All" under Brand Styles — union of image styles + sidebar product styles. */
+export const LIBRARY_BRAND_STYLES_ALL_ID = 'library-brand-styles-all';
+
+export function isLibraryAssetInBrandStylesSidebar(
+  asset: (typeof MOCK_LIBRARY_ASSETS)[number]
+): boolean {
+  const brandImageIds = new Set(MOCK_IMAGE_STYLES.map((s) => s.id));
+  const brandProductIds = new Set(LIBRARY_SIDEBAR_PRODUCT_STYLES.map((s) => s.id));
+  if (brandImageIds.has(asset.styleId)) return true;
+  if (
+    asset.styleId === 'style-3' &&
+    'productStyleId' in asset &&
+    asset.productStyleId &&
+    brandProductIds.has(asset.productStyleId)
+  ) {
+    return true;
+  }
+  return false;
+}
 
 // ── Character Locations ─────────────────────────────────────────────
 export const MOCK_CHARACTER_LOCATIONS = [

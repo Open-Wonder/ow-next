@@ -18,11 +18,21 @@ import styles from './ContextMenu.module.css';
 export interface MenuItem {
   id: string;
   label: string;
+  /** Secondary line (e.g. in submenu rows). */
+  description?: string;
   icon?: React.ReactNode;
   danger?: boolean;
   dividerBefore?: boolean;
   submenu?: MenuItem[];
+  /** Extra content below submenu items (e.g. create row). */
+  submenuFooter?: React.ReactNode;
+  /** Applied to the submenu panel when this item is hovered. */
+  submenuClassName?: string;
   checked?: boolean;
+  /** When false, menu stays open after activating this item (e.g. checkbox rows). */
+  closeOnSelect?: boolean;
+  /** Non-interactive row (muted, no pointer). */
+  disabled?: boolean;
   onAction?: () => void;
 }
 
@@ -150,6 +160,7 @@ export default function ContextMenu({
 
   const handleItemClick = useCallback(
     (item: MenuItem) => {
+      if (item.disabled) return;
       if (item.submenu?.length) return;
       item.onAction?.();
       onClose();
@@ -159,8 +170,11 @@ export default function ContextMenu({
 
   const handleSubmenuItemClick = useCallback(
     (item: MenuItem) => {
+      if (item.disabled) return;
       item.onAction?.();
-      onClose();
+      if (item.closeOnSelect !== false) {
+        onClose();
+      }
     },
     [onClose]
   );
@@ -206,13 +220,16 @@ export default function ContextMenu({
           ) : (
             <div
               role="button"
-              tabIndex={0}
+              tabIndex={item.disabled ? -1 : 0}
+              aria-disabled={item.disabled ? true : undefined}
               className={cn(
                 styles.item,
-                item.danger && styles.itemDanger
+                item.danger && styles.itemDanger,
+                item.disabled && styles.itemDisabled
               )}
               onClick={() => handleItemClick(item)}
               onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
+                if (item.disabled) return;
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   handleItemClick(item);
@@ -249,7 +266,7 @@ export default function ContextMenu({
 
         return (
           <div
-            className={styles.submenu}
+            className={cn(styles.submenu, item.submenuClassName)}
             style={{
               left: submenuX,
               top: submenuY,
@@ -264,13 +281,16 @@ export default function ContextMenu({
                 )}
                 <div
                   role="button"
-                  tabIndex={0}
+                  tabIndex={subItem.disabled ? -1 : 0}
+                  aria-disabled={subItem.disabled ? true : undefined}
                   className={cn(
                     styles.item,
-                    subItem.danger && styles.itemDanger
+                    subItem.danger && styles.itemDanger,
+                    subItem.disabled && styles.itemDisabled
                   )}
                   onClick={() => handleSubmenuItemClick(subItem)}
                   onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
+                    if (subItem.disabled) return;
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
                       handleSubmenuItemClick(subItem);
@@ -280,7 +300,14 @@ export default function ContextMenu({
                   {subItem.icon && (
                     <span className={styles.itemIcon}>{subItem.icon}</span>
                   )}
-                  <span className={styles.itemLabel}>{subItem.label}</span>
+                  {subItem.description ? (
+                    <span className={styles.itemLabelStack}>
+                      <span className={styles.itemLabelPrimary}>{subItem.label}</span>
+                      <span className={styles.itemLabelDescription}>{subItem.description}</span>
+                    </span>
+                  ) : (
+                    <span className={styles.itemLabel}>{subItem.label}</span>
+                  )}
                   {subItem.checked !== undefined && (
                     <span
                       className={cn(
@@ -299,6 +326,9 @@ export default function ContextMenu({
                 </div>
               </div>
             ))}
+            {item.submenuFooter ? (
+              <div className={styles.submenuFooter}>{item.submenuFooter}</div>
+            ) : null}
           </div>
         );
       })()}

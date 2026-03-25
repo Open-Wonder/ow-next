@@ -54,6 +54,12 @@
   color: var(--color-element-toast-error-text);
 }
 
+.itemDisabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
 .itemIcon {
   display: flex;
   width: 16px;
@@ -64,6 +70,29 @@
 .itemLabel {
   flex: 1;
   min-width: 0;
+}
+
+.itemLabelStack {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+.itemLabelPrimary {
+  font-size: var(--dimension-typography-interface-inputheadline-fontsize);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--dimension-typography-interface-inputheadline-lineheight);
+  color: var(--color-copy-primary);
+}
+
+.itemLabelDescription {
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  color: var(--color-gray-500);
 }
 
 .itemChevron {
@@ -115,4 +144,14 @@
   z-index: 1001;
   transform-origin: top;
   animation: dropdownEnter 0.2s ease;
+}
+
+.submenuWide {
+  min-width: 260px;
+}
+
+.submenuFooter {
+  border-top: 1px solid var(--color-dividerdefault);
+  margin-top: var(--dimension-4);
+  padding-top: var(--dimension-4);
 }
