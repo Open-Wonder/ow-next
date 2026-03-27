@@ -39,7 +39,7 @@ export default function ImageCard({
             onClick={onLike}
             title={liked ? 'Unlike' : 'Like'}
           >
-            <Heart size={16} weight={liked ? 'fill' : 'regular'} />
+            <Heart size={16} weight={liked ? 'bold' : 'regular'} />
           </IconButton>
         </div>
 

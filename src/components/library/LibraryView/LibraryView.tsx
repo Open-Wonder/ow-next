@@ -585,7 +585,7 @@ export default function LibraryView() {
                       >
                         <Heart
                           size={14}
-                          weight={likedIds.has(asset.id) ? 'fill' : 'regular'}
+                          weight={likedIds.has(asset.id) ? 'bold' : 'regular'}
                         />
                       </button>
                     </div>

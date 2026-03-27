@@ -35,6 +35,7 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
   const handleModify = useCallback(
     (assetId: string, prompt: string) => {
       const original = state.currentSession?.generatedAssets.find((a) => a.id === assetId);
+      const sessionId = state.currentSession?.id;
       setModifyAssetId(null);
       setModifyPrompt('');
       setModifyAnchor(null);
@@ -49,7 +50,7 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
       };
 
       setTimeout(() => {
-        dispatch({ type: 'ADD_GENERATED_ASSET', payload });
+        dispatch({ type: 'ADD_GENERATED_ASSET', payload, sessionId });
       }, 1200);
     },
     [dispatch, state.currentSession]
@@ -127,7 +128,7 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
   if (!state.currentSession) return null;
 
   const assets = state.currentSession.generatedAssets;
-  const isGenerating = state.isGeneratingImages;
+  const isGenerating = state.generatingSessionIds.has(state.currentSession.id);
   const skeletonCount = isGenerating ? 4 : 0;
 
   return (
@@ -180,7 +181,7 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
                 <img src={asset.url} alt={asset.prompt} className={styles.thumbImage} />
                 {asset.savedToLibrary && (
                   <span className={styles.savedHeartOnly} aria-hidden>
-                    <Heart size={14} weight="fill" />
+                    <Heart size={14} weight="regular" />
                   </span>
                 )}
                 <div
@@ -204,7 +205,7 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
                   >
                     <Heart
                       size={14}
-                      weight={asset.savedToLibrary ? 'fill' : 'regular'}
+                      weight={asset.savedToLibrary ? 'bold' : 'regular'}
                     />
                   </button>
                 </div>

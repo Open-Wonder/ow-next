@@ -92,7 +92,6 @@ export interface ChatState {
   sessions: ChatSession[];
   canvasOpen: boolean;
   historyOpen: boolean;
-  isGeneratingImages: boolean;
   activeManagePanel: ManagePanelType;
   activeManagerModal: ManagerModalType;
   /** When set, the opened modal shows the form overlay immediately (from ManageListView). */
@@ -111,8 +110,8 @@ export interface ChatState {
   userLibraryCollections: { id: string; name: string }[];
   /** Per-asset list of collection IDs (overrides mock `libraryCollectionId` when set). */
   assetCollectionMembership: Record<string, string[]>;
-  /** Session ID currently generating images. */
-  generatingSessionId: string | null;
+  /** Session IDs with in-flight image generation (supports parallel sessions). */
+  generatingSessionIds: Set<string>;
   /** Session IDs that completed generation but user hasn't opened them yet (green dot). */
   unseenCompletedSessionIds: Set<string>;
   /** Library assets currently generating HD upscale. */
@@ -130,9 +129,10 @@ export interface ChatState {
 type ChatAction =
   | { type: 'SET_ACTIVE_VIEW'; payload: ActiveView }
   | { type: 'SET_MODE'; payload: CreativeMode }
-  | { type: 'SEND_MESSAGE'; payload: ChatMessage }
+  /** Optional `sessionId` when creating a new session (keeps client timers aligned with the session row). */
+  | { type: 'SEND_MESSAGE'; payload: ChatMessage; sessionId?: string }
   | { type: 'ADD_ASSISTANT_MESSAGE'; payload: ChatMessage }
-  | { type: 'ADD_GENERATED_ASSET'; payload: GeneratedAsset }
+  | { type: 'ADD_GENERATED_ASSET'; payload: GeneratedAsset; sessionId?: string }
   | { type: 'SAVE_ASSET_TO_LIBRARY'; payload: { assetId: string; folderId: string } }
   | { type: 'UNSAVE_ASSET'; payload: string }
   | { type: 'REMOVE_ASSET_FROM_FOLDER'; payload: { assetId: string; folderId: string } }
@@ -152,7 +152,7 @@ type ChatAction =
   | { type: 'SET_MANAGE_PANEL'; payload: ManagePanelType }
   | { type: 'SET_MANAGER_MODAL'; payload: ManagerModalType }
   | { type: 'SET_MANAGER_MODAL_FORM_INIT'; payload: ManagerModalFormInit }
-  | { type: 'SET_GENERATING_IMAGES'; payload: boolean }
+  | { type: 'SET_GENERATING_IMAGES'; payload: { active: boolean; sessionId?: string } }
   | { type: 'SET_ACTIVE_LIBRARY_COLLECTION'; payload: string }
   | { type: 'TOGGLE_LIKED_ASSET'; payload: string }
   | {
@@ -177,7 +177,6 @@ const initialState: ChatState = {
   sessions: [],
   canvasOpen: false,
   historyOpen: false,
-  isGeneratingImages: false,
   activeManagePanel: null,
   activeManagerModal: null,
   managerModalFormInit: null,
@@ -204,7 +203,7 @@ const initialState: ChatState = {
   likedAssetIds: new Set(MOCK_LIBRARY_ASSETS.filter((a) => a.liked).map((a) => a.id)),
   userLibraryCollections: [],
   assetCollectionMembership: {},
-  generatingSessionId: null,
+  generatingSessionIds: new Set(),
   unseenCompletedSessionIds: new Set(),
   hdGeneratingAssetIds: new Set(),
   hdReadyAssetIds: new Set(),
@@ -335,11 +334,14 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       const wasCurrent = state.currentSession?.id === id;
       const nextUnseen = new Set(state.unseenCompletedSessionIds);
       nextUnseen.delete(id);
+      const nextGenerating = new Set(state.generatingSessionIds);
+      nextGenerating.delete(id);
       return {
         ...state,
         sessions: updatedSessions,
         currentSession: wasCurrent ? null : state.currentSession,
         unseenCompletedSessionIds: nextUnseen,
+        generatingSessionIds: nextGenerating,
       };
     }
 
@@ -348,6 +350,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         ...state,
         sessions: [],
         currentSession: null,
+        generatingSessionIds: new Set(),
       };
 
     case 'SET_MODE': {
@@ -362,7 +365,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'EXIT_MODE':
       // Full reset: go back to landing state, clear current session.
       // Use the session's mode so the correct tab is active (Imagine → Imagine, Chat → Chat).
-      // Keep isGeneratingImages and generatingSessionId so sidebar still shows loading state
+      // Keep generatingSessionIds so sidebar still shows loading state
       // when user closes session while generation runs; green dot appears when it finishes.
       const exitMode = state.currentSession?.mode ?? 'imagine';
       return {
@@ -393,7 +396,11 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
           state.mode === 'create'
             ? state.imagineOptions.aspectRatio
             : undefined;
-        session = createSession(state.mode, styleId, aspectRatio);
+        let created = createSession(state.mode, styleId, aspectRatio);
+        if (action.sessionId) {
+          created = { ...created, id: action.sessionId };
+        }
+        session = created;
       }
       const updatedMessages = [...session.messages, action.payload];
       const updatedSession = {
@@ -429,22 +436,33 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     }
 
     case 'ADD_GENERATED_ASSET': {
-      if (!state.currentSession) return state;
-      const updatedAssets = [action.payload, ...state.currentSession.generatedAssets];
+      // Prefer explicit sessionId (e.g. from async simulation) so assets attach to the
+      // correct session when the user has switched away.
+      const targetId =
+        action.sessionId ??
+        (state.generatingSessionIds.size === 1
+          ? [...state.generatingSessionIds][0]
+          : undefined) ??
+        state.currentSession?.id;
+      if (!targetId) return state;
+      const baseSession = state.sessions.find((s) => s.id === targetId);
+      if (!baseSession) return state;
+
+      const updatedAssets = [action.payload, ...baseSession.generatedAssets];
       const updatedSession = {
-        ...state.currentSession,
+        ...baseSession,
         generatedAssets: updatedAssets,
-        aspectRatio:
-          state.currentSession.aspectRatio ?? action.payload.aspectRatio,
+        aspectRatio: baseSession.aspectRatio ?? action.payload.aspectRatio,
       };
       const updatedSessions = state.sessions.map((s) =>
-        s.id === updatedSession.id ? updatedSession : s
+        s.id === targetId ? updatedSession : s
       );
+      const viewingTarget = state.currentSession?.id === targetId;
       return {
         ...state,
-        currentSession: updatedSession,
+        currentSession: viewingTarget ? updatedSession : state.currentSession,
         sessions: updatedSessions,
-        canvasOpen: true,
+        canvasOpen: viewingTarget ? true : state.canvasOpen,
       };
     }
 
@@ -615,24 +633,25 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return { ...state, managerModalFormInit: action.payload };
 
     case 'SET_GENERATING_IMAGES': {
-      const isGenerating = action.payload;
-      if (isGenerating) {
-        return {
-          ...state,
-          isGeneratingImages: true,
-          generatingSessionId: state.currentSession?.id ?? null,
-        };
+      const { active, sessionId: payloadSessionId } = action.payload;
+      const sid = payloadSessionId ?? state.currentSession?.id;
+      if (!sid) return state;
+
+      if (active) {
+        const next = new Set(state.generatingSessionIds);
+        next.add(sid);
+        return { ...state, generatingSessionIds: next };
       }
-      const genId = state.generatingSessionId;
-      const isStillCurrent = genId === state.currentSession?.id;
+
+      const next = new Set(state.generatingSessionIds);
+      next.delete(sid);
       const nextUnseen = new Set(state.unseenCompletedSessionIds);
-      if (genId && !isStillCurrent) {
-        nextUnseen.add(genId);
+      if (sid !== state.currentSession?.id) {
+        nextUnseen.add(sid);
       }
       return {
         ...state,
-        isGeneratingImages: false,
-        generatingSessionId: null,
+        generatingSessionIds: next,
         unseenCompletedSessionIds: nextUnseen,
       };
     }

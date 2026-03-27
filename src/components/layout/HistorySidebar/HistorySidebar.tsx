@@ -12,9 +12,12 @@ import {
   Package,
   UserCircle,
   MapPin,
+  Image,
+  ChatCircle,
 } from '@phosphor-icons/react';
 import cn from 'classnames';
 import { useChat, CreativeMode, ChatSession, SettingsPanelType } from '@/lib/chat-context';
+import { formatRelativeDate } from '@/lib/format-date';
 import {
   MOCK_IMAGE_STYLES,
   LIBRARY_BRAND_STYLES_ALL_ID,
@@ -26,6 +29,7 @@ import {
 } from '@/lib/mock-data';
 import { getCollectionIdsForAsset } from '@/lib/library-collections';
 import { useIsAdmin } from '@/lib/permissions';
+import Spinner from '@/components/common/Spinner';
 import BrandSwitcher from '@/components/layout/BrandSwitcher/BrandSwitcher';
 import SidebarUserSection from '@/components/layout/SidebarUserSection/SidebarUserSection';
 import styles from './HistorySidebar.module.css';
@@ -78,21 +82,17 @@ const MODE_LABELS: Record<CreativeMode, string> = {
   assistant: 'Chat',
 };
 
-function getStyleName(session: ChatSession): string | null {
-  if (!session.styleId) return null;
-  const imageStyle = MOCK_IMAGE_STYLES.find((s) => s.id === session.styleId);
-  if (imageStyle) return imageStyle.name;
-  const productStyle = MOCK_PRODUCT_STYLES.find((s) => s.id === session.styleId);
-  if (productStyle) return productStyle.name;
-  return null;
-}
-
-function getAspectRatio(session: ChatSession): string | null {
-  return (
-    session.aspectRatio ??
-    session.generatedAssets[0]?.aspectRatio ??
-    null
-  );
+/** First generated image, else style preview from styleId — so list rows can always show a thumb. */
+function getSessionListThumbnailUrl(session: ChatSession): string | undefined {
+  const fromAsset = session.generatedAssets[0]?.url;
+  if (fromAsset) return fromAsset;
+  if (session.styleId) {
+    const imageStyle = MOCK_IMAGE_STYLES.find((s) => s.id === session.styleId);
+    if (imageStyle) return imageStyle.image;
+    const productStyle = MOCK_PRODUCT_STYLES.find((s) => s.id === session.styleId);
+    if (productStyle) return productStyle.image;
+  }
+  return undefined;
 }
 
 export default function HistorySidebar() {
@@ -271,11 +271,19 @@ export default function HistorySidebar() {
                     <p className={styles.empty}>{emptyMessage}</p>
                   ) : (
                     filteredSessions.map((session) => {
-                      const isGenerating = state.generatingSessionId === session.id;
+                      const isGenerating = state.generatingSessionIds.has(session.id);
                       const isUnseenCompleted = state.unseenCompletedSessionIds.has(session.id);
-                      const styleName = getStyleName(session);
-                      const aspectRatio = getAspectRatio(session);
-                      const meta = [styleName ?? '—', aspectRatio ?? '—'].join(' · ');
+                      const assets = session.generatedAssets;
+                      const thumbUrl = getSessionListThumbnailUrl(session);
+                      const dateStr = formatRelativeDate(session.createdAt);
+                      const savedToLibraryCount = assets.filter(
+                        (a) => a.savedToLibrary
+                      ).length;
+                      const metaText = dateStr;
+                      const libraryBadgeLabel =
+                        savedToLibraryCount > 0
+                          ? `${savedToLibraryCount} ${savedToLibraryCount === 1 ? 'image' : 'images'} added to library`
+                          : undefined;
                       return (
                         <div
                           key={session.id}
@@ -290,20 +298,73 @@ export default function HistorySidebar() {
                             className={styles.sessionContent}
                             onClick={() => handleLoadSession(session.id)}
                           >
-                            {isUnseenCompleted && (
-                              <span className={styles.completedDot} aria-hidden />
-                            )}
+                            <div className={styles.sessionThumbWrap}>
+                              {thumbUrl ? (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
+                                  src={thumbUrl}
+                                  alt=""
+                                  className={styles.sessionThumb}
+                                />
+                              ) : (
+                                <div
+                                  className={styles.sessionThumbPlaceholder}
+                                  aria-hidden
+                                >
+                                  {session.mode === 'assistant' ? (
+                                    <ChatCircle
+                                      size={18}
+                                      weight="regular"
+                                      className={styles.sessionThumbPlaceholderIcon}
+                                    />
+                                  ) : (
+                                    <Image
+                                      size={18}
+                                      weight="regular"
+                                      className={styles.sessionThumbPlaceholderIcon}
+                                    />
+                                  )}
+                                </div>
+                              )}
+                              {isGenerating && (
+                                <span
+                                  className={styles.thumbGeneratingBadge}
+                                  aria-label="Generating images"
+                                >
+                                  <Spinner
+                                    size="sm"
+                                    className={styles.thumbGeneratingSpinner}
+                                  />
+                                </span>
+                              )}
+                              {!isGenerating && isUnseenCompleted && (
+                                <span
+                                  className={styles.thumbUnseenBadge}
+                                  aria-label="New images — open session to dismiss"
+                                />
+                              )}
+                              {!isGenerating &&
+                                !isUnseenCompleted &&
+                                savedToLibraryCount > 0 && (
+                                  <span
+                                    className={styles.libraryCountBadge}
+                                    aria-label={libraryBadgeLabel}
+                                  >
+                                    {savedToLibraryCount > 99
+                                      ? '99+'
+                                      : savedToLibraryCount}
+                                  </span>
+                                )}
+                            </div>
                             <span className={styles.sessionTextBlock}>
                               <span className={styles.sessionTitle}>{session.title}</span>
-                              {session.mode !== 'assistant' &&
-                                (isGenerating ? (
-                                  <span className={styles.generatingIndicator}>
-                                    <span className={styles.pulsingDot} aria-hidden />
-                                    Generating images...
+                              {session.mode !== 'assistant' && (
+                                <span className={styles.sessionMeta}>
+                                  <span className={styles.sessionMetaText}>
+                                    {metaText}
                                   </span>
-                                ) : (
-                                  <span className={styles.sessionMeta}>{meta}</span>
-                                ))}
+                                </span>
+                              )}
                             </span>
                           </button>
                           <button

@@ -1,0 +1,12 @@
+---
+description: Phosphor Icons — durchgängig Outline (keine Fill-Icons)
+globs: "**/*.{tsx,ts,jsx,js}"
+alwaysApply: true
+---
+
+## Phosphor Icons (@phosphor-icons/react)
+
+- Im **gesamten Projekt** werden Phosphor-Icons **nur als Outline / Strich-Varianten** verwendet — **niemals** die gefüllten Varianten (`weight="fill"`).
+- Erlaubte Weights: z. B. `thin`, `light`, `regular`, `bold` (alles Umriss-basiert). Für „aktiv“ oder hervorgehobene Zustände **`bold` vs. `regular`** nutzen oder **Farbe / Hintergrund**, nicht Fill.
+- **Duotone** und **Fill** nicht für UI-Icons in diesem Projekt verwenden.
+- Referenz: [Phosphor Icons](https://phosphoricons.com/)

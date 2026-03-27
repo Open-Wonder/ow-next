@@ -3,6 +3,7 @@
 import { ClockCounterClockwise } from '@phosphor-icons/react';
 import cn from 'classnames';
 import { useChat, CreativeMode } from '@/lib/chat-context';
+import { formatRelativeDate } from '@/lib/format-date';
 import styles from './ChatSessionHistory.module.css';
 
 const MODE_LABELS: Record<CreativeMode, string> = {
@@ -36,17 +37,6 @@ export default function ChatSessionHistory() {
 
   const handleLoadSession = (id: string) => {
     dispatch({ type: 'LOAD_SESSION', payload: id });
-  };
-
-  const formatDate = (iso: string) => {
-    const d = new Date(iso);
-    const now = new Date();
-    const diffMs = now.getTime() - d.getTime();
-    const diffHrs = diffMs / (1000 * 60 * 60);
-    if (diffHrs < 1) return 'Just now';
-    if (diffHrs < 24) return `${Math.floor(diffHrs)}h ago`;
-    if (diffHrs < 48) return 'Yesterday';
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   return (
@@ -86,7 +76,7 @@ export default function ChatSessionHistory() {
               <span className={styles.sessionTitle}>{session.title}</span>
               <span className={styles.sessionMeta}>
                 {session.generatedAssets.length} assets &middot;{' '}
-                {formatDate(session.createdAt)}
+                {formatRelativeDate(session.createdAt)}
               </span>
             </div>
           </button>

@@ -1,0 +1,103 @@
+/* Product tags (Figma-aligned): pill, inline-flex, full radius — xs / s / m density */
+
+.tag {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+  border-radius: var(--radius-full);
+  font-family: var(--font-family-default);
+  font-weight: var(--font-weight-medium);
+  max-width: 100%;
+  /* Default: 1px vertical padding + 1px borders → at least as wide as tall */
+  min-width: calc(4px + 1lh);
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Sizes ───────────────────────────────────────────────────────── */
+
+.size_xs {
+  gap: 3px;
+  padding: 1px 6px 1px 4px;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.size_s {
+  gap: 4px;
+  padding: 1px 7px 1px 5px;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+}
+
+.size_m {
+  gap: 4px;
+  padding: 3px 8px 3px 5px;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  /* 3px vertical padding + 1px borders */
+  min-width: calc(8px + 1lh);
+}
+
+/* Same as .sessionMeta in HistorySidebar — pairs with relative time text */
+.size_meta {
+  gap: 3px;
+  padding: 1px 6px 1px 4px;
+  font-size: calc(var(--font-size-sm) - 3px);
+  line-height: var(--line-height-normal);
+}
+
+/* ── Tones ───────────────────────────────────────────────────────── */
+
+.tone_neutral {
+  background: var(--color-gray-200);
+  border: 1px solid var(--color-gray-300);
+  color: var(--color-black);
+}
+
+.tone_neutral .icon :global(svg) {
+  color: currentColor;
+}
+
+/* Library / success: green text + subtle fill + outline (Figma chip) */
+.tone_success {
+  background: rgba(57, 172, 0, 0.12);
+  border: 1px solid rgba(57, 172, 0, 0.35);
+  color: var(--color-signal-green-500);
+}
+
+.tone_success .icon :global(svg) {
+  color: var(--color-signal-green-500);
+}
+
+/* 1px stroke on Phosphor outline icons inside tags */
+.tone_success .icon :global(svg path),
+.tone_success .icon :global(svg circle),
+.tone_success .icon :global(svg line),
+.tone_success .icon :global(svg polyline),
+.tone_success .icon :global(svg rect) {
+  stroke-width: 1px;
+}
+
+.tone_neutral .icon :global(svg path),
+.tone_neutral .icon :global(svg circle),
+.tone_neutral .icon :global(svg line),
+.tone_neutral .icon :global(svg polyline),
+.tone_neutral .icon :global(svg rect) {
+  stroke-width: 1px;
+}

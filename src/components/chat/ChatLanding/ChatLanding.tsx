@@ -146,9 +146,11 @@ export default function ChatLanding() {
     state.currentSession &&
     (state.currentSession.messages.length > 0 || state.currentSession.generatedAssets.length > 0);
   const assets = state.currentSession?.generatedAssets ?? [];
-  const isGeneratingImages = state.isGeneratingImages;
+  const currentSessionId = state.currentSession?.id;
+  const isThisSessionGenerating =
+    !!currentSessionId && state.generatingSessionIds.has(currentSessionId);
   const showFullViewportLoader =
-    hasImageSessionView && isGeneratingImages && assets.length === 0;
+    hasImageSessionView && isThisSessionGenerating && assets.length === 0;
   const effectiveMode = state.mode === 'idle' ? 'imagine' : state.mode;
   const headline = MODE_HEADLINES[effectiveMode];
 
@@ -186,7 +188,12 @@ export default function ChatLanding() {
       content: message,
       timestamp: new Date().toISOString(),
     };
-    dispatch({ type: 'SEND_MESSAGE', payload: msg });
+    const generationSessionId = state.currentSession?.id ?? `session-${Date.now()}`;
+    dispatch({
+      type: 'SEND_MESSAGE',
+      payload: msg,
+      sessionId: state.currentSession ? undefined : generationSessionId,
+    });
     setIsGenerating(true);
 
     // Simulate assistant response
@@ -202,7 +209,10 @@ export default function ChatLanding() {
 
       // If in a creative mode (not idle/assistant), simulate generating 4 assets
       if (effectiveMode !== 'idle' && effectiveMode !== 'assistant') {
-        dispatch({ type: 'SET_GENERATING_IMAGES', payload: true });
+        dispatch({
+          type: 'SET_GENERATING_IMAGES',
+          payload: { active: true, sessionId: generationSessionId },
+        });
         const delays = [10000, 10500, 11000, 11500];
         delays.forEach((delay, i) => {
           setTimeout(() => {
@@ -217,9 +227,13 @@ export default function ChatLanding() {
                 aspectRatio: state.imagineOptions.aspectRatio,
                 savedToLibrary: false,
               },
+              sessionId: generationSessionId,
             });
             if (i === delays.length - 1) {
-              dispatch({ type: 'SET_GENERATING_IMAGES', payload: false });
+              dispatch({
+                type: 'SET_GENERATING_IMAGES',
+                payload: { active: false, sessionId: generationSessionId },
+              });
             }
           }, delay);
         });

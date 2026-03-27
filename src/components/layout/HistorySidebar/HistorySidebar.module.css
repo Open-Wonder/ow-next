@@ -88,12 +88,20 @@
   position: relative;
 }
 
+.sessionItem + .sessionItem {
+  margin-top: 4px;
+}
+
 .sessionItem:hover {
-  background: var(--color-white);
+  background: var(--color-gray-200);
 }
 
 .sessionItemActive {
   background: rgba(var(--color-purplish-blue-rgb), 0.06);
+}
+
+.sessionItemActive:hover {
+  background: rgba(var(--color-purplish-blue-rgb), 0.1);
 }
 
 .sessionContent {
@@ -119,8 +127,7 @@
   flex: 1;
 }
 
-.sessionTextBlock .sessionMeta,
-.sessionTextBlock .generatingIndicator {
+.sessionTextBlock .sessionMeta {
   margin-top: -4px;
 }
 
@@ -135,54 +142,116 @@
   min-width: 0;
 }
 
-/* ── Session status indicators ─────────────────────────────────────────── */
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.pulsingDot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-purplish-blue);
-  animation: pulse 1.2s ease-in-out infinite;
-  flex-shrink: 0;
-}
-
-.generatingIndicator {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: calc(var(--font-size-sm) - 3px);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-gray-500);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.completedDot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-signal-green-500);
+/* Thumbnail + app-icon-style count badge (top-right, like Mail / Calendar) */
+.sessionThumbWrap {
+  position: relative;
   flex-shrink: 0;
   align-self: center;
+  width: 36px;
+  height: 36px;
+}
+
+/* was 32px — +4px width & +4px height */
+.sessionThumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.sessionThumbPlaceholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-gray-200);
+  color: var(--color-gray-400);
+}
+
+.libraryCountBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  z-index: 1;
+  box-sizing: border-box;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--color-black);
+  color: var(--color-white);
+  font-family: var(--font-family-default);
+  font-size: 8px;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  text-align: center;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--color-white);
+  pointer-events: none;
+}
+
+/* Same slot as library count — generating (blue + spinner) */
+.thumbGeneratingBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: var(--color-blue-500);
+  border: 2px solid var(--color-white);
+  display: grid;
+  place-items: center;
+  color: var(--color-white);
+  pointer-events: none;
+}
+
+.thumbGeneratingSpinner {
+  width: 10px !important;
+  height: 10px !important;
+  min-width: 10px;
+  min-height: 10px;
+  border-width: 1.5px !important;
+}
+
+/* Same slot — new images, until session opened once */
+.thumbUnseenBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: var(--color-signal-green-500);
+  border: 2px solid var(--color-white);
+  pointer-events: none;
+}
+
+.sessionThumbPlaceholderIcon {
+  flex-shrink: 0;
 }
 
 .sessionMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
   font-size: calc(var(--font-size-sm) - 3px);
   font-weight: var(--font-weight-medium);
   color: var(--color-gray-500);
+}
+
+.sessionMetaText {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -195,7 +264,7 @@
   width: 24px;
   height: 24px;
   padding: 0;
-  margin-left: var(--spacing-2xs);
+  margin-left: 4px;
   border: none;
   background: none;
   border-radius: var(--radius-sm);
