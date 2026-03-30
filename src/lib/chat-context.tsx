@@ -438,12 +438,12 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'ADD_GENERATED_ASSET': {
       // Prefer explicit sessionId (e.g. from async simulation) so assets attach to the
       // correct session when the user has switched away.
+      const onlyGeneratingSessionId =
+        state.generatingSessionIds.size === 1
+          ? state.generatingSessionIds.values().next().value
+          : undefined;
       const targetId =
-        action.sessionId ??
-        (state.generatingSessionIds.size === 1
-          ? [...state.generatingSessionIds][0]
-          : undefined) ??
-        state.currentSession?.id;
+        action.sessionId ?? onlyGeneratingSessionId ?? state.currentSession?.id;
       if (!targetId) return state;
       const baseSession = state.sessions.find((s) => s.id === targetId);
       if (!baseSession) return state;
