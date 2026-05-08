@@ -4,8 +4,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   ArrowUp,
   ImageSquare,
-  X,
-  Check,
 } from '@phosphor-icons/react';
 import cn from 'classnames';
 import { useChat } from '@/lib/chat-context';
@@ -15,12 +13,14 @@ import {
   MOCK_PRODUCT_STYLES,
   MOCK_CHARACTER_LOCATIONS,
   MOCK_AD_TEMPLATES,
+  MOCK_LIBRARY_ASSETS,
 } from '@/lib/mock-data';
 import { Button } from '@/components/common/Button';
 import CustomSelect from '@/components/common/Select';
 import Box from '@/components/common/Box';
-import StyleChip from '@/components/chat/StyleChip/StyleChip';
 import PromptEditor, { type PromptEditorRef } from '@/components/chat/ChatInput/PromptEditor';
+import MarketsMultiSelect from '@/components/chat/ChatInput/MarketsMultiSelect';
+import CreateModeImageField from '@/components/chat/ChatInput/CreateModeImageField';
 import AspectRatioSelector from '@/components/common/AspectRatioSelector';
 import {
   IMAGE_FORMATS_IMAGE_CREATION,
@@ -35,14 +35,6 @@ interface ChatInputProps {
   onSend?: (message: string) => boolean | void;
 }
 
-interface InlineTag {
-  id: string;
-  label: string;
-  image?: string;
-  category: 'product' | 'character' | 'style' | 'format';
-  onRemove: () => void;
-}
-
 /* ── Main Component ─────────────────────────────────────────────────── */
 
 const usePromptEditor = (mode: string) =>
@@ -52,7 +44,7 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const promptEditorRef = useRef<PromptEditorRef>(null);
-  const { state, dispatch } = useChat();
+  const { state } = useChat();
   const mode = state.mode;
   const hasMessages = state.currentSession && state.currentSession.messages.length > 0;
   const hasAssets = state.currentSession && state.currentSession.generatedAssets.length > 0;
@@ -74,7 +66,7 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+    el.style.height = Math.min(el.scrollHeight, 160 * 1.4) + 'px';
   }, [value]);
 
   useEffect(() => {
@@ -90,8 +82,13 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
         ? !!state.productOptions.shotStyle
         : mode === 'character'
           ? !!state.characterOptions.location
-          : true;
-  const canSendTextarea = value.trim() && canSendRequirement;
+          : mode === 'create'
+            ? state.createOptions.markets.length > 0 && state.createOptions.sourceAssetIds.length > 0
+            : true;
+  const canSendTextarea =
+    mode === 'create'
+      ? canSendRequirement
+      : value.trim() && canSendRequirement;
   const canSendPromptEditor = !promptEditorEmpty && canSendRequirement;
   const canSend = usePromptEditorFor ? canSendPromptEditor : canSendTextarea;
 
@@ -99,6 +96,8 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
     if (mode === 'imagine' && !state.imagineOptions.brandStyle) return;
     if (mode === 'product' && !state.productOptions.shotStyle) return;
     if (mode === 'character' && !state.characterOptions.location) return;
+    if (mode === 'create' && state.createOptions.markets.length === 0) return;
+    if (mode === 'create' && state.createOptions.sourceAssetIds.length === 0) return;
     if (usePromptEditorFor) {
       const text = promptEditorRef.current?.getText() ?? '';
       const trimmed = text.trim();
@@ -112,6 +111,22 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
         }
       }
     } else {
+      if (mode === 'create') {
+        const chosenIds = state.createOptions.sourceAssetIds;
+        if (chosenIds.length === 0) return;
+        const names = chosenIds
+          .map((id) => MOCK_LIBRARY_ASSETS.find((a) => a.id === id)?.name)
+          .filter(Boolean) as string[];
+        const message =
+          names.length > 0
+            ? `Adapt for selected markets: ${names.join(', ')}`
+            : 'Adapt selected images for selected markets';
+        const accepted = onSend?.(message);
+        if (accepted !== false) {
+          // keep sources + markets for iteration unless cleared elsewhere
+        }
+        return;
+      }
       const trimmed = value.trim();
       if (!trimmed) return;
       const accepted = onSend?.(trimmed);
@@ -123,7 +138,17 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
         }
       }
     }
-  }, [mode, state.imagineOptions.brandStyle, state.productOptions.shotStyle, state.characterOptions.location, usePromptEditorFor, value, onSend]);
+  }, [
+    mode,
+    state.imagineOptions.brandStyle,
+    state.productOptions.shotStyle,
+    state.characterOptions.location,
+    state.createOptions.markets,
+    state.createOptions.sourceAssetIds,
+    usePromptEditorFor,
+    value,
+    onSend,
+  ]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -144,26 +169,9 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
     />
   );
 
-  /* Derive inline tags from current state (product/character use PromptEditor; create mode uses tags) */
-  const inlineTags: InlineTag[] = [];
-
-  if (mode === 'create') {
-    if (state.createOptions.adFormat) {
-      const t = MOCK_AD_TEMPLATES.find((x) => x.id === state.createOptions.adFormat);
-      if (t) {
-        inlineTags.push({
-          id: `fmt-${t.id}`,
-          label: t.name,
-          category: 'format',
-          onRemove: () => dispatch({ type: 'SET_CREATE_OPTIONS', payload: { adFormat: '' } }),
-        });
-      }
-    }
-  }
-
   const placeholder =
     mode === 'idle'
-      ? 'Choose a mode below to get started'
+      ? 'Select a creation mode, then describe what you need'
       : mode === 'imagine'
         ? state.imagineOptions.brandStyle
           ? 'Describe what you see - I will generate on-brand images and videos for you.'
@@ -178,29 +186,12 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
               : 'Add characters with @, pick a location, and describe the scene. Select a location below first.'
             : mode === 'assistant'
               ? 'Ask me anything about your brand'
-              : 'Select a format below, then describe the ad you want to create';
+              : '';
 
   return (
     <Box variant="white" noPadding className={cn(styles.wrapper, className)}>
-      {/* Input area: inline tags + textarea */}
+      {/* Input area */}
       <div className={styles.inputArea}>
-          {inlineTags.length > 0 && (
-            <div className={styles.tagsRow}>
-              {inlineTags.map((tag) => (
-                <span key={tag.id} className={cn(styles.inlineTag, styles[`tag_${tag.category}`])}>
-                  {tag.image && (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={tag.image} alt="" className={styles.inlineTagImage} />
-                  )}
-                  {tag.label}
-                  <button className={styles.inlineTagRemove} onClick={tag.onRemove}>
-                    <X size={10} />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-
           <div className={styles.textRow}>
             {usePromptEditorFor ? (
               <PromptEditor
@@ -210,6 +201,8 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
                 onContentChange={setPromptEditorEmpty}
                 content={inImageSessionView && lastUserMessage?.content ? lastUserMessage.content : undefined}
               />
+            ) : mode === 'create' ? (
+              <CreateModeImageField />
             ) : (
               <textarea
                 ref={textareaRef}
@@ -428,59 +421,64 @@ function CharacterPickers({ createButton }: { createButton: React.ReactNode }) {
   );
 }
 
-/* ── Create (Ads) Pickers ───────────────────────────────────────────── */
+/* ── Create (Market Adaption) Pickers ──────────────────────────────── */
 
 function CreatePickers({ createButton }: { createButton: React.ReactNode }) {
   const { state, dispatch } = useChat();
-  const opts = state.createOptions;
+
+  // #region agent log
+  fetch('http://127.0.0.1:7500/ingest/fff7b8ab-4ff1-480e-8430-c9ee6c72aac9', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Debug-Session-Id': 'fb1b2f',
+    },
+    body: JSON.stringify({
+      sessionId: 'fb1b2f',
+      runId: 'pre-verify',
+      hypothesisId: 'H1',
+      location: 'ChatInput.tsx:CreatePickers',
+      message: 'MOCK_AD_TEMPLATES binding after import',
+      data: {
+        len: MOCK_AD_TEMPLATES.length,
+        firstId: MOCK_AD_TEMPLATES[0]?.id ?? null,
+      },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+
+  const isValidCreateFormat = IMAGE_FORMATS_IMAGE_CREATION.some(
+    (f) => f.aspectRatio === state.imagineOptions.aspectRatio
+  );
+  const displayValue = isValidCreateFormat
+    ? state.imagineOptions.aspectRatio
+    : DEFAULT_FORMAT_IMAGE_CREATION.id;
 
   return (
-    <>
-      <div className={styles.pickerRow}>
-        <span className={styles.pickerLabel}>Format</span>
-        {MOCK_AD_TEMPLATES.map((t) => (
-          <Button
-            key={t.id}
-            variant="secondary"
+    <div className={styles.pickerRow}>
+      <div className={styles.pickerRowLeft}>
+        <div className={styles.formatSelectWrapInline}>
+          <AspectRatioSelector
+            value={displayValue}
+            onChange={(format) =>
+              dispatch({
+                type: 'SET_IMAGINE_OPTIONS',
+                payload: {
+                  aspectRatio: format.aspectRatio as '16:9' | '1:1' | '4:5',
+                },
+              })
+            }
+            type="create"
             size="sm"
-            icon={opts.adFormat === t.id ? <Check size={12} /> : undefined}
-            onClick={() =>
-              dispatch({
-                type: 'SET_CREATE_OPTIONS',
-                payload: { adFormat: opts.adFormat === t.id ? '' : t.id },
-              })
-            }
-            className={cn(
-              styles.chipButton,
-              opts.adFormat === t.id && styles.chipButtonActive
-            )}
-          >
-            <span>{t.name}</span>
-            <span className={styles.chipMeta}>{t.dimensions}</span>
-          </Button>
-        ))}
-        <div className={styles.createButtonWrap}>{createButton}</div>
-      </div>
-
-      <div className={styles.pickerRow}>
-        {MOCK_IMAGE_STYLES.map((s) => (
-          <StyleChip
-            key={s.id}
-            name={s.name}
-            image={s.image}
-            description={s.description}
-            previews={s.previews}
-            isActive={opts.brandStyle === s.id}
-            onClick={() =>
-              dispatch({
-                type: 'SET_CREATE_OPTIONS',
-                payload: { brandStyle: opts.brandStyle === s.id ? '' : s.id },
-              })
-            }
           />
-        ))}
+        </div>
+        <div className={styles.styleSelectWrap}>
+          <MarketsMultiSelect />
+        </div>
       </div>
-    </>
+      <div className={styles.createButtonWrap}>{createButton}</div>
+    </div>
   );
 }
 

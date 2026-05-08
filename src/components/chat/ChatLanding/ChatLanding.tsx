@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CaretLeft } from '@phosphor-icons/react';
 import ChatInput from '@/components/chat/ChatInput/ChatInput';
+import PromptModeTabs from '@/components/chat/ChatInput/PromptModeTabs';
 import { Button } from '@/components/common/Button';
 import ChatMessages from '@/components/chat/ChatMessages/ChatMessages';
 import ChatSessionHistory from '@/components/chat/ChatSessionHistory/ChatSessionHistory';
 import EditCanvas from '@/components/chat/EditCanvas/EditCanvas';
 import GenerationLoader from '@/components/chat/EditCanvas/GenerationLoader';
-import ModeBoxes from '@/components/chat/ModeBoxes/ModeBoxes';
+import PromptModeIntro from './PromptModeIntro';
 import { useChat, CreativeMode } from '@/lib/chat-context';
 import { useIsAdmin } from '@/lib/permissions';
 import { MOCK_IMAGES } from '@/lib/mock-data';
@@ -122,11 +123,11 @@ const MODE_HEADLINES: Record<CreativeMode, { greeting: string; sub: string }> = 
     sub: 'Select your brand characters and describe the moment \u2014 I\u2019ll make it real.',
   },
   create: {
-    greeting: 'Design ads that stay on brand.',
+    greeting: 'Adapt your visuals for multiple markets',
     sub: 'Choose a format, set the style, and describe the ad you need.',
   },
   assistant: {
-    greeting: 'Your brand assistant is here.',
+    greeting: 'Ask your brand anything',
     sub: 'Ask anything about your brand guidelines, assets, or content strategy.',
   },
 };
@@ -137,9 +138,6 @@ export default function ChatLanding() {
   const isAdmin = useIsAdmin();
   const router = useRouter();
 
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/9e12a5bc-bcf8-4863-ba85-1864bc6b6f1f',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChatLanding.tsx:render',message:'ChatLanding rendered',data:{mode:state.mode,hasSession:!!state.currentSession},timestamp:Date.now(),hypothesisId:'E'})}).catch(()=>{});
-  // #endregion
   const hasMessages = state.currentSession && state.currentSession.messages.length > 0;
   const hasImageSessionView =
     (state.mode === 'imagine' || state.mode === 'product' || state.mode === 'character') &&
@@ -181,6 +179,8 @@ export default function ChatLanding() {
     if (effectiveMode === 'imagine' && !state.imagineOptions.brandStyle) return false;
     if (effectiveMode === 'product' && !state.productOptions.shotStyle) return false;
     if (effectiveMode === 'character' && !state.characterOptions.location) return false;
+    if (effectiveMode === 'create' && state.createOptions.markets.length === 0) return false;
+    if (effectiveMode === 'create' && state.createOptions.sourceAssetIds.length === 0) return false;
 
     const msg = {
       id: `msg-${Date.now()}`,
@@ -286,7 +286,9 @@ export default function ChatLanding() {
                 <EditCanvas embedded />
               </motion.div>
               <div className={`${styles.inputDock} ${styles.inputDockFloating}`}>
-                <ChatInput onSend={handleSend} />
+                <div className={styles.chatPromptShell}>
+                  <ChatInput onSend={handleSend} />
+                </div>
               </div>
             </motion.div>
           ) : !hasMessages ? (
@@ -298,26 +300,30 @@ export default function ChatLanding() {
               exit={{ opacity: 0 }}
               transition={fadeOut}
             >
-              <motion.div
-                className={styles.landingHero}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -40 }}
-                transition={fadeIn}
-              >
-                <h1 className={styles.greeting}>{headline.greeting}</h1>
-              </motion.div>
-              <div className={styles.landingInputWrap}>
-                <ChatInput onSend={handleSend} />
+              <div className={styles.landingStack}>
+                <motion.div
+                  className={styles.landingHero}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -40 }}
+                  transition={fadeIn}
+                >
+                  <h1 className={styles.greeting}>{headline.greeting}</h1>
+                </motion.div>
+                <div className={styles.landingInputWrap}>
+                  <PromptModeTabs />
+                  <ChatInput onSend={handleSend} />
+                </div>
+                <motion.div
+                  className={styles.landingPromptWidth}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={fadeIn}
+                >
+                  <PromptModeIntro />
+                </motion.div>
               </div>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={fadeIn}
-              >
-                <ModeBoxes />
-              </motion.div>
             </motion.div>
           ) : (
             <motion.div
@@ -353,7 +359,9 @@ export default function ChatLanding() {
                 />
               </motion.div>
               <div className={styles.inputDock}>
-                <ChatInput onSend={handleSend} />
+                <div className={styles.chatPromptShell}>
+                  <ChatInput onSend={handleSend} />
+                </div>
               </div>
             </motion.div>
           )}

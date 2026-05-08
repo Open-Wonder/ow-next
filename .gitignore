@@ -14,6 +14,7 @@ node_modules
 /build
 
 # misc
+.cursor/debug*.log
 .DS_Store
 *.pem
 *.tsbuildinfo

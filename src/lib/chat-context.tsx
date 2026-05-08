@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { MOCK_LIBRARY_ASSETS } from '@/lib/mock-data';
+import { MOCK_LIBRARY_ASSETS, MOCK_USER } from '@/lib/mock-data';
 import { getCollectionIdsForAsset } from '@/lib/library-collections';
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -45,6 +45,8 @@ export interface ChatSession {
   messages: ChatMessage[];
   generatedAssets: GeneratedAsset[];
   createdAt: string;
+  /** Shown in history subline (e.g. current user); optional for older persisted sessions. */
+  authorName?: string;
   /** Style ID used when session was created (brandStyle for imagine/create, shotStyle for product). */
   styleId?: string;
   /** Aspect ratio used when session was created. */
@@ -71,6 +73,10 @@ export interface CharacterOptions {
 export interface CreateOptions {
   adFormat: string;
   brandStyle: string;
+  /** Selected market region ids (multi-market create). */
+  markets: string[];
+  /** Library / Explore assets used as source images for multi-market create. */
+  sourceAssetIds: string[];
 }
 
 export type ManagePanelType = 'styles' | 'products' | 'shots' | 'characters' | null;
@@ -141,7 +147,7 @@ type ChatAction =
   | { type: 'DELETE_ASSET'; payload: string }
   | { type: 'SET_CANVAS_OPEN'; payload: boolean }
   | { type: 'SET_HISTORY_OPEN'; payload: boolean }
-  | { type: 'NEW_CHAT' }
+  | { type: 'NEW_CHAT'; nextMode?: CreativeMode }
   | { type: 'LOAD_SESSION'; payload: string }
   | { type: 'SET_IMAGINE_OPTIONS'; payload: Partial<ImagineOptions> }
   | { type: 'SET_PRODUCT_OPTIONS'; payload: Partial<ProductOptions> }
@@ -199,7 +205,9 @@ const initialState: ChatState = {
   },
   createOptions: {
     adFormat: '',
-    brandStyle: '',
+    brandStyle: 'style-1',
+    markets: [],
+    sourceAssetIds: [],
   },
   pendingModifyPrompt: null,
   activeLibraryCollection: '',
@@ -229,6 +237,7 @@ function createSession(
     messages: [],
     generatedAssets: [],
     createdAt: new Date().toISOString(),
+    authorName: MOCK_USER.name,
     styleId,
     aspectRatio,
   };
@@ -560,11 +569,12 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'SET_HISTORY_OPEN':
       return { ...state, historyOpen: action.payload };
 
-    case 'NEW_CHAT':
+    case 'NEW_CHAT': {
+      const nextMode = action.nextMode ?? 'idle';
       return {
         ...state,
         currentSession: null,
-        mode: 'idle',
+        mode: nextMode,
         canvasOpen: false,
         pendingModifyPrompt: null,
         imagineOptions: initialState.imagineOptions,
@@ -572,6 +582,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         characterOptions: initialState.characterOptions,
         createOptions: initialState.createOptions,
       };
+    }
 
     case 'LOAD_SESSION': {
       const session = state.sessions.find((s) => s.id === action.payload);
@@ -597,8 +608,11 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'SET_CHARACTER_OPTIONS':
       return { ...state, characterOptions: { ...state.characterOptions, ...action.payload } };
 
-    case 'SET_CREATE_OPTIONS':
-      return { ...state, createOptions: { ...state.createOptions, ...action.payload } };
+    case 'SET_CREATE_OPTIONS': {
+      const next = { ...state.createOptions, ...action.payload };
+      if (next.markets.length === 0) next.sourceAssetIds = [];
+      return { ...state, createOptions: next };
+    }
 
     case 'LOAD_SESSIONS':
       return { ...state, sessions: action.payload };
@@ -615,6 +629,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         messages: [],
         generatedAssets: [asset],
         createdAt: new Date().toISOString(),
+        authorName: MOCK_USER.name,
         styleId: state.imagineOptions.brandStyle,
         aspectRatio: asset.aspectRatio ?? state.imagineOptions.aspectRatio,
       };
@@ -829,6 +844,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               messages: [],
               generatedAssets: [],
               createdAt: new Date(Date.now() - (sessionIdx + 1) * 3600000).toISOString(),
+              authorName: MOCK_USER.name,
               styleId: mode === 'assistant' ? undefined : styleId,
               aspectRatio: mode === 'assistant' ? undefined : aspectRatios[i % aspectRatios.length],
             });

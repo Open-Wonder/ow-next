@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState, type ElementType } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -12,12 +12,16 @@ import {
   Package,
   UserCircle,
   MapPin,
-  Image,
   ChatCircle,
+  Sparkle,
+  Globe,
+  SquaresFour,
+  Plus,
 } from '@phosphor-icons/react';
 import cn from 'classnames';
-import { useChat, CreativeMode, ChatSession, SettingsPanelType } from '@/lib/chat-context';
-import { formatRelativeDate } from '@/lib/format-date';
+import { useChat, CreativeMode, SettingsPanelType } from '@/lib/chat-context';
+import { useBrand } from '@/lib/brand-context';
+import { formatSessionHistoryTime } from '@/lib/format-date';
 import {
   MOCK_IMAGE_STYLES,
   LIBRARY_BRAND_STYLES_ALL_ID,
@@ -25,6 +29,7 @@ import {
   MOCK_LIBRARY_COLLECTIONS,
   MOCK_PRODUCT_STYLES,
   MOCK_LIBRARY_ASSETS,
+  MOCK_USER,
   isLibraryAssetInBrandStylesSidebar,
 } from '@/lib/mock-data';
 import { getCollectionIdsForAsset } from '@/lib/library-collections';
@@ -73,32 +78,136 @@ const SETTINGS_SECTIONS: SettingsSection[] = [
   },
 ];
 
-const MODE_LABELS: Record<CreativeMode, string> = {
-  idle: 'General',
-  imagine: 'Imagine',
-  product: 'Product',
-  character: 'Character',
-  create: 'Create',
-  assistant: 'Chat',
+const SESSION_MODE_ICON: Record<
+  CreativeMode,
+  { Icon: React.ElementType; badgeClass: string }
+> = {
+  idle: {
+    Icon: ChatCircle,
+    badgeClass: styles.sessionModeBadgeIdle,
+  },
+  imagine: {
+    Icon: Sparkle,
+    badgeClass: styles.sessionModeBadgeImagine,
+  },
+  product: {
+    Icon: Package,
+    badgeClass: styles.sessionModeBadgeProduct,
+  },
+  character: {
+    Icon: UserCircle,
+    badgeClass: styles.sessionModeBadgeCharacter,
+  },
+  create: {
+    Icon: Globe,
+    badgeClass: styles.sessionModeBadgeCreate,
+  },
+  assistant: {
+    Icon: ChatCircle,
+    badgeClass: styles.sessionModeBadgeAssistant,
+  },
 };
 
-/** First generated image, else style preview from styleId — so list rows can always show a thumb. */
-function getSessionListThumbnailUrl(session: ChatSession): string | undefined {
-  const fromAsset = session.generatedAssets[0]?.url;
-  if (fromAsset) return fromAsset;
-  if (session.styleId) {
-    const imageStyle = MOCK_IMAGE_STYLES.find((s) => s.id === session.styleId);
-    if (imageStyle) return imageStyle.image;
-    const productStyle = MOCK_PRODUCT_STYLES.find((s) => s.id === session.styleId);
-    if (productStyle) return productStyle.image;
-  }
-  return undefined;
+/** Tooltips / a11y — aligned with PromptModeTabs labels where applicable */
+const MODE_LABELS_SHORT: Record<CreativeMode, string> = {
+  idle: 'General',
+  imagine: 'Imagery',
+  product: 'Product',
+  character: 'Character',
+  create: 'Market Adaption',
+  assistant: 'Assistant',
+};
+
+type HistoryFilter =
+  | 'all'
+  | 'assistant'
+  | 'imagine'
+  | 'create'
+  | 'product'
+  | 'character';
+
+const FILTER_ACTIVE_CLASS: Record<HistoryFilter, string> = {
+  all: styles.historyFilterBtnActiveAll,
+  assistant: styles.historyFilterBtnActiveAssistant,
+  imagine: styles.historyFilterBtnActiveImagine,
+  create: styles.historyFilterBtnActiveCreate,
+  product: styles.historyFilterBtnActiveProduct,
+  character: styles.historyFilterBtnActiveCharacter,
+};
+
+/**
+ * Order matches PromptModeTabs (Imagery → Market Adaption → Product → Character → Assistant),
+ * with “All” first for clearing the filter.
+ */
+const HISTORY_FILTER_ITEMS: {
+  id: HistoryFilter;
+  Icon: ElementType;
+  title: string;
+  ariaLabel: string;
+}[] = [
+  {
+    id: 'all',
+    Icon: SquaresFour,
+    title: 'All sessions',
+    ariaLabel: 'Show all sessions',
+  },
+  {
+    id: 'imagine',
+    Icon: Sparkle,
+    title: 'Imagery',
+    ariaLabel: 'Show imagery sessions only',
+  },
+  {
+    id: 'create',
+    Icon: Globe,
+    title: 'Market Adaption',
+    ariaLabel: 'Show Market Adaption sessions only',
+  },
+  {
+    id: 'product',
+    Icon: Package,
+    title: 'Product',
+    ariaLabel: 'Show product sessions only',
+  },
+  {
+    id: 'character',
+    Icon: UserCircle,
+    title: 'Character',
+    ariaLabel: 'Show character sessions only',
+  },
+  {
+    id: 'assistant',
+    Icon: ChatCircle,
+    title: 'Assistant',
+    ariaLabel: 'Show assistant sessions only',
+  },
+];
+
+function sessionMatchesHistoryFilter(session: { mode: CreativeMode }, filter: HistoryFilter) {
+  if (filter === 'all') return true;
+  return session.mode === filter;
 }
 
 export default function HistorySidebar() {
   const router = useRouter();
   const { state, dispatch } = useChat();
+  const { hasAssistant } = useBrand();
   const isAdmin = useIsAdmin();
+  const [historyFilter, setHistoryFilter] = useState<HistoryFilter>('all');
+
+  const visibleHistoryFilters = useMemo(
+    () =>
+      HISTORY_FILTER_ITEMS.filter(
+        (item) => item.id !== 'assistant' || hasAssistant
+      ),
+    [hasAssistant]
+  );
+
+  useEffect(() => {
+    if (!hasAssistant && historyFilter === 'assistant') {
+      setHistoryFilter('all');
+    }
+  }, [hasAssistant, historyFilter]);
 
   // Default to "All" (Brand Styles) when switching to library
   useEffect(() => {
@@ -118,15 +227,35 @@ export default function HistorySidebar() {
     dispatch({ type: 'SET_ACTIVE_LIBRARY_COLLECTION', payload: styleId });
   };
 
-  const filteredSessions =
-    state.mode === 'idle'
-      ? state.sessions
-      : state.sessions.filter((s) => s.mode === state.mode);
+  const sortedSessions = useMemo(
+    () =>
+      [...state.sessions].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ),
+    [state.sessions]
+  );
 
-  const emptyMessage =
-    state.mode === 'idle'
-      ? 'No previous conversations'
-      : `No ${MODE_LABELS[state.mode].toLowerCase()} conversations yet`;
+  const filteredSessions = useMemo(
+    () => sortedSessions.filter((s) => sessionMatchesHistoryFilter(s, historyFilter)),
+    [sortedSessions, historyFilter]
+  );
+
+  const handleNewSession = () => {
+    const sessionMode = state.currentSession?.mode;
+    const nextModeRaw =
+      sessionMode && sessionMode !== 'idle'
+        ? sessionMode
+        : state.mode !== 'idle'
+          ? state.mode
+          : 'imagine';
+    let nextMode: CreativeMode = nextModeRaw;
+    if (nextMode === 'assistant' && !hasAssistant) {
+      nextMode = 'imagine';
+    }
+    dispatch({ type: 'NEW_CHAT', nextMode });
+    router.push('/');
+  };
 
   // Collection counts (liked assets per style / named collection)
   const collectionCounts = Object.fromEntries(
@@ -264,22 +393,64 @@ export default function HistorySidebar() {
                 transition={slideTransition}
               >
                 <div className={styles.list}>
-                  <h3 className={cn(styles.listHeading, styles.listHeadingTop)}>
-                    {state.mode === 'assistant' ? 'Chat History' : 'Creation History'}
-                  </h3>
-                  {filteredSessions.length === 0 ? (
-                    <p className={styles.empty}>{emptyMessage}</p>
+                  <div className={styles.historyToolbar}>
+                    <div
+                      className={styles.historyFilterGroup}
+                      role="group"
+                      aria-label="Filter history"
+                    >
+                      {visibleHistoryFilters.map(({ id, Icon, title, ariaLabel }) => {
+                        const active = historyFilter === id;
+                        return (
+                          <button
+                            key={id}
+                            type="button"
+                            className={cn(
+                              styles.historyFilterBtn,
+                              active && FILTER_ACTIVE_CLASS[id]
+                            )}
+                            onClick={() => setHistoryFilter(id)}
+                            aria-pressed={active}
+                            title={title}
+                            aria-label={ariaLabel}
+                          >
+                            <Icon
+                              size={17}
+                              weight={active ? 'bold' : 'regular'}
+                              aria-hidden
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.historyNewBtn}
+                      onClick={handleNewSession}
+                      aria-label="Start new session"
+                      title="New session"
+                    >
+                      <Plus size={18} weight="regular" aria-hidden />
+                    </button>
+                  </div>
+                    <h3 className={cn(styles.listHeading, styles.listHeadingHistory)}>
+                      History
+                    </h3>
+                  {sortedSessions.length === 0 ? (
+                    <p className={styles.empty}>No sessions yet</p>
+                  ) : filteredSessions.length === 0 ? (
+                    <p className={styles.empty}>No sessions for this filter</p>
                   ) : (
                     filteredSessions.map((session) => {
                       const isGenerating = state.generatingSessionIds.has(session.id);
                       const isUnseenCompleted = state.unseenCompletedSessionIds.has(session.id);
                       const assets = session.generatedAssets;
-                      const thumbUrl = getSessionListThumbnailUrl(session);
-                      const dateStr = formatRelativeDate(session.createdAt);
+                      const modeIcon = SESSION_MODE_ICON[session.mode];
+                      const ModeIcon = modeIcon.Icon;
+                      const sublineText = `${session.authorName ?? MOCK_USER.name} · ${formatSessionHistoryTime(session.createdAt)}`;
                       const savedToLibraryCount = assets.filter(
                         (a) => a.savedToLibrary
                       ).length;
-                      const metaText = dateStr;
                       const libraryBadgeLabel =
                         savedToLibraryCount > 0
                           ? `${savedToLibraryCount} ${savedToLibraryCount === 1 ? 'image' : 'images'} added to library`
@@ -298,73 +469,55 @@ export default function HistorySidebar() {
                             className={styles.sessionContent}
                             onClick={() => handleLoadSession(session.id)}
                           >
-                            <div className={styles.sessionThumbWrap}>
-                              {thumbUrl ? (
-                                /* eslint-disable-next-line @next/next/no-img-element */
-                                <img
-                                  src={thumbUrl}
-                                  alt=""
-                                  className={styles.sessionThumb}
-                                />
-                              ) : (
-                                <div
-                                  className={styles.sessionThumbPlaceholder}
-                                  aria-hidden
-                                >
-                                  {session.mode === 'assistant' ? (
-                                    <ChatCircle
-                                      size={18}
-                                      weight="regular"
-                                      className={styles.sessionThumbPlaceholderIcon}
-                                    />
-                                  ) : (
-                                    <Image
-                                      size={18}
-                                      weight="regular"
-                                      className={styles.sessionThumbPlaceholderIcon}
+                            <span
+                              className={cn(
+                                styles.sessionModeBadge,
+                                modeIcon.badgeClass
+                              )}
+                              aria-label={`${MODE_LABELS_SHORT[session.mode]} session`}
+                            >
+                              <ModeIcon size={14} weight="regular" aria-hidden />
+                            </span>
+                            <span className={styles.sessionTextBlock}>
+                              <span className={styles.sessionTitleRow}>
+                                <span className={styles.sessionTitle}>
+                                  {session.title}
+                                </span>
+                                <span className={styles.sessionStatusGroup}>
+                                  {isGenerating && (
+                                    <span
+                                      className={styles.sessionGeneratingBadge}
+                                      aria-label="Generating images"
+                                    >
+                                      <Spinner
+                                        size="sm"
+                                        className={styles.sessionGeneratingSpinner}
+                                      />
+                                    </span>
+                                  )}
+                                  {!isGenerating && isUnseenCompleted && (
+                                    <span
+                                      className={styles.sessionUnseenDot}
+                                      aria-label="New images — open session to dismiss"
                                     />
                                   )}
-                                </div>
-                              )}
-                              {isGenerating && (
-                                <span
-                                  className={styles.thumbGeneratingBadge}
-                                  aria-label="Generating images"
-                                >
-                                  <Spinner
-                                    size="sm"
-                                    className={styles.thumbGeneratingSpinner}
-                                  />
+                                  {!isGenerating &&
+                                    !isUnseenCompleted &&
+                                    savedToLibraryCount > 0 && (
+                                      <span
+                                        className={styles.sessionLibraryCount}
+                                        aria-label={libraryBadgeLabel}
+                                      >
+                                        {savedToLibraryCount > 99
+                                          ? '99+'
+                                          : savedToLibraryCount}
+                                      </span>
+                                    )}
                                 </span>
-                              )}
-                              {!isGenerating && isUnseenCompleted && (
-                                <span
-                                  className={styles.thumbUnseenBadge}
-                                  aria-label="New images — open session to dismiss"
-                                />
-                              )}
-                              {!isGenerating &&
-                                !isUnseenCompleted &&
-                                savedToLibraryCount > 0 && (
-                                  <span
-                                    className={styles.libraryCountBadge}
-                                    aria-label={libraryBadgeLabel}
-                                  >
-                                    {savedToLibraryCount > 99
-                                      ? '99+'
-                                      : savedToLibraryCount}
-                                  </span>
-                                )}
-                            </div>
-                            <span className={styles.sessionTextBlock}>
-                              <span className={styles.sessionTitle}>{session.title}</span>
-                              {session.mode !== 'assistant' && (
-                                <span className={styles.sessionMeta}>
-                                  <span className={styles.sessionMetaText}>
-                                    {metaText}
-                                  </span>
-                                </span>
-                              )}
+                              </span>
+                              <span className={styles.sessionMeta}>
+                                <span className={styles.sessionMetaText}>{sublineText}</span>
+                              </span>
                             </span>
                           </button>
                           <button

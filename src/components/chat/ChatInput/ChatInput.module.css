@@ -71,14 +71,150 @@
   color: var(--color-gray-600);
 }
 
+/* ── Prompt mode tabs (FlipToggle-aligned pill track) ─────────────── */
+
+.promptModeTabList {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  align-self: center;
+  height: 40px;
+  flex-shrink: 0;
+  padding: 4px;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.promptModeTabList::-webkit-scrollbar {
+  display: none;
+}
+
+.promptModeTab {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  height: 100%;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-family-default);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.promptModeTab:active {
+  transform: scale(0.97);
+}
+
+.promptModeTab:focus-visible {
+  outline: 2px solid var(--color-gray-400);
+  outline-offset: 2px;
+}
+
+.promptModeTabIndicator {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+/* Active pill: ~10 % tint of the tab foreground color (must mirror .promptModeTabActive*) */
+.promptModeTab:has(.promptModeTabActiveImagine) .promptModeTabIndicator {
+  background: color-mix(in srgb, #3730a3 10%, transparent);
+}
+
+.promptModeTab:has(.promptModeTabActiveCreate) .promptModeTabIndicator {
+  background: color-mix(in srgb, #0f766e 10%, transparent);
+}
+
+.promptModeTab:has(.promptModeTabActiveProduct) .promptModeTabIndicator {
+  background: color-mix(in srgb, #9a3412 10%, transparent);
+}
+
+.promptModeTab:has(.promptModeTabActiveCharacter) .promptModeTabIndicator {
+  background: color-mix(in srgb, #a21caf 10%, transparent);
+}
+
+.promptModeTab:has(.promptModeTabActiveAssistant) .promptModeTabIndicator {
+  background: color-mix(in srgb, #1d4ed8 10%, transparent);
+}
+
+.promptModeTabInner {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--color-gray-500);
+  line-height: 1;
+  transition: color 200ms ease;
+}
+
+/* Active tab: mode-specific foreground (contrast on white pill ≥ WCAG AA for body text) */
+.promptModeTabActiveImagine {
+  color: #3730a3;
+}
+
+.promptModeTabActiveCreate {
+  color: #0f766e;
+}
+
+.promptModeTabActiveProduct {
+  color: #9a3412;
+}
+
+.promptModeTabActiveCharacter {
+  color: #a21caf;
+}
+
+.promptModeTabActiveAssistant {
+  color: #1d4ed8;
+}
+
+.promptModeTabIcon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  color: currentColor;
+}
+
+.promptModeTabLabel {
+  min-width: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.promptModeTabActiveImagine .promptModeTabLabel,
+.promptModeTabActiveCreate .promptModeTabLabel,
+.promptModeTabActiveProduct .promptModeTabLabel,
+.promptModeTabActiveCharacter .promptModeTabLabel,
+.promptModeTabActiveAssistant .promptModeTabLabel {
+  font-weight: var(--font-weight-semibold);
+}
+
 /* ── Input Area (tags + textarea) ──────────────────────────────── */
-/* Fixed min-height to match Imagine mode – keeps input at same level across all modes */
 .inputArea {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: var(--spacing-sm);
-  min-height: 68px;
+  min-height: calc(68px * 1.4);
   flex-shrink: 0;
 }
 
@@ -89,10 +225,11 @@
 }
 
 .textRow {
+  --chat-input-control-min-height: calc(36px * 1.4);
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: var(--spacing-xs);
-  min-height: 36px;
+  min-height: var(--chat-input-control-min-height);
 }
 
 /* ── Inline Tags ────────────────────────────────────────────────── */
@@ -190,17 +327,24 @@
 .promptEditorWrap {
   flex: 1;
   min-width: 0;
+  align-self: stretch;
   display: flex;
-  align-items: center;
-  min-height: 36px;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: var(--chat-input-control-min-height, calc(36px * 1.4));
 }
 
 .promptEditor {
   flex: 1;
   min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .promptEditor :global(.ProseMirror) {
+  flex: 1;
+  box-sizing: border-box;
   font-family: var(--font-family-default);
   font-size: 16px;
   color: var(--color-black);
@@ -208,7 +352,7 @@
   outline: none;
   line-height: var(--line-height-normal);
   padding: var(--spacing-sm);
-  min-height: 36px;
+  min-height: var(--chat-input-control-min-height, calc(36px * 1.4));
 }
 
 .promptEditor :global(.ProseMirror p) {
@@ -227,6 +371,8 @@
 
 .textarea {
   flex: 1;
+  align-self: stretch;
+  box-sizing: border-box;
   font-family: var(--font-family-default);
   font-size: 16px;
   color: var(--color-black);
@@ -236,8 +382,8 @@
   resize: none;
   line-height: var(--line-height-normal);
   padding: var(--spacing-sm);
-  min-height: 36px;
-  max-height: 160px;
+  min-height: var(--chat-input-control-min-height, calc(36px * 1.4));
+  max-height: calc(160px * 1.4);
 }
 
 .textarea::placeholder {
@@ -456,12 +602,52 @@
   flex-shrink: 0;
 }
 
+/* ── Markets multi-select (Create / Market Adaption) — popover rows only ─ */
+
+.marketsMultiList {
+  /* shares Select.list padding + scroll; optional min width for labels */
+  min-width: var(--anchor-width, 220px);
+}
+
+.marketsMultiRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dimension-8);
+  padding: var(--dimension-8) var(--dimension-12);
+  border-radius: var(--dimension-cornerroundings-xs-corner);
+  font-size: var(--dimension-typography-interface-body-fontsize);
+  line-height: var(--dimension-typography-interface-body-lineheight);
+  color: var(--color-copy-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.marketsMultiRow:hover {
+  background: var(--color-button-text-hoverfill);
+}
+
+.marketsMultiCheckbox {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--color-copy-primary);
+  cursor: pointer;
+}
+
+.marketsMultiLabel {
+  flex: 1;
+  min-width: 0;
+  user-select: none;
+}
+
 .createButtonWrap {
   flex-shrink: 0;
   margin-left: auto;
 }
 
 .sendButton {
+  align-self: center;
   width: 40px;
   height: 40px;
 }

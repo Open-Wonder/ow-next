@@ -29,11 +29,11 @@ const MODE_HEADLINES: Record<CreativeMode, { greeting: string; sub: string }> = 
     sub: "Select your brand characters and describe the moment — I'll make it real.",
   },
   create: {
-    greeting: 'Design ads that stay on brand.',
+    greeting: 'Adapt your visuals for multiple markets',
     sub: 'Choose a format, set the style, and describe the ad you need.',
   },
   assistant: {
-    greeting: 'Your brand assistant is here.',
+    greeting: 'Ask your brand anything',
     sub: 'Ask anything about your brand guidelines, assets, or content strategy.',
   },
 };

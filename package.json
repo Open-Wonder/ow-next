@@ -9,8 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "tokens:build": "node scripts/build-tokens.mjs",
-    "predev": "yarn run tokens:build",
-    "prebuild": "yarn run tokens:build"
+    "predev": "node scripts/build-tokens.mjs",
+    "prebuild": "node scripts/build-tokens.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",

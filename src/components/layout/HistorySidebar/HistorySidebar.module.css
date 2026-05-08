@@ -61,6 +61,136 @@
   margin-bottom: 4px;
 }
 
+.historyToolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-xs);
+  padding: 0 var(--spacing-xs);
+  /* Extra room below filters (wrap / plus) before the History heading */
+  margin-bottom: calc(var(--spacing-md) + 16px);
+  min-height: 36px;
+}
+
+.historyFilterGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.historyFilterBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-gray-500);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.historyFilterBtn:hover {
+  background: var(--color-gray-200);
+  color: var(--color-black);
+}
+
+/* Active filter — same hues as .sessionModeBadge* / PromptModeTabs */
+.historyFilterBtnActiveAll {
+  background: var(--color-gray-100);
+  color: var(--color-black);
+}
+
+.historyFilterBtnActiveAll:hover {
+  background: var(--color-gray-200);
+  color: var(--color-black);
+}
+
+.historyFilterBtnActiveImagine {
+  background: color-mix(in srgb, #3730a3 10%, transparent);
+  color: #3730a3;
+}
+
+.historyFilterBtnActiveImagine:hover {
+  background: color-mix(in srgb, #3730a3 16%, transparent);
+  color: #3730a3;
+}
+
+.historyFilterBtnActiveCreate {
+  background: color-mix(in srgb, #0f766e 10%, transparent);
+  color: #0f766e;
+}
+
+.historyFilterBtnActiveCreate:hover {
+  background: color-mix(in srgb, #0f766e 16%, transparent);
+  color: #0f766e;
+}
+
+.historyFilterBtnActiveProduct {
+  background: color-mix(in srgb, #9a3412 10%, transparent);
+  color: #9a3412;
+}
+
+.historyFilterBtnActiveProduct:hover {
+  background: color-mix(in srgb, #9a3412 16%, transparent);
+  color: #9a3412;
+}
+
+.historyFilterBtnActiveCharacter {
+  background: color-mix(in srgb, #a21caf 10%, transparent);
+  color: #a21caf;
+}
+
+.historyFilterBtnActiveCharacter:hover {
+  background: color-mix(in srgb, #a21caf 16%, transparent);
+  color: #a21caf;
+}
+
+.historyFilterBtnActiveAssistant {
+  background: color-mix(in srgb, #1d4ed8 10%, transparent);
+  color: #1d4ed8;
+}
+
+.historyFilterBtnActiveAssistant:hover {
+  background: color-mix(in srgb, #1d4ed8 16%, transparent);
+  color: #1d4ed8;
+}
+
+.historyNewBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-gray-600);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.historyNewBtn:hover {
+  background: var(--color-gray-200);
+  color: var(--color-black);
+}
+
+.listHeadingHistory {
+  margin-top: 0;
+}
+
 /* Secondary section title (e.g. Collections below Brand Styles) */
 .listHeadingSection {
   display: flex;
@@ -81,6 +211,8 @@
   display: flex;
   align-items: center;
   width: 100%;
+  min-height: 60px;
+  box-sizing: border-box;
   padding: var(--spacing-2xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
   transition: background-color var(--transition-fast);
@@ -119,63 +251,106 @@
   font: inherit;
 }
 
-.sessionTextBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  min-width: 0;
-  flex: 1;
-}
-
-.sessionTextBlock .sessionMeta {
-  margin-top: -4px;
-}
-
-.sessionTitle {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-black);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-  min-width: 0;
-}
-
-/* Thumbnail + app-icon-style count badge (top-right, like Mail / Calendar) */
-.sessionThumbWrap {
-  position: relative;
+/* Mode chip — circular; colors mirror PromptModeTabs (ChatInput.module.css) */
+.sessionModeBadge {
   flex-shrink: 0;
-  align-self: center;
-  width: 36px;
-  height: 36px;
-}
-
-/* was 32px — +4px width & +4px height */
-.sessionThumb {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-}
-
-.sessionThumbPlaceholder {
-  width: 36px;
-  height: 36px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-gray-200);
-  color: var(--color-gray-400);
 }
 
-.libraryCountBadge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  z-index: 1;
+.sessionModeBadgeImagine {
+  background: color-mix(in srgb, #3730a3 10%, transparent);
+  color: #3730a3;
+}
+
+.sessionModeBadgeCreate {
+  background: color-mix(in srgb, #0f766e 10%, transparent);
+  color: #0f766e;
+}
+
+.sessionModeBadgeProduct {
+  background: color-mix(in srgb, #9a3412 10%, transparent);
+  color: #9a3412;
+}
+
+.sessionModeBadgeCharacter {
+  background: color-mix(in srgb, #a21caf 10%, transparent);
+  color: #a21caf;
+}
+
+.sessionModeBadgeAssistant {
+  background: color-mix(in srgb, #1d4ed8 10%, transparent);
+  color: #1d4ed8;
+}
+
+.sessionModeBadgeIdle {
+  background: var(--color-gray-200);
+  color: var(--color-gray-500);
+}
+
+.sessionTextBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+  justify-content: center;
+}
+
+.sessionTextBlock .sessionMeta {
+  margin-top: 0;
+}
+
+.sessionTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+}
+
+.sessionStatusGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.sessionGeneratingBadge {
+  box-sizing: border-box;
+  width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: var(--color-blue-500);
+  border: 1px solid var(--color-white);
+  display: grid;
+  place-items: center;
+  color: var(--color-white);
+  flex-shrink: 0;
+}
+
+.sessionGeneratingSpinner {
+  width: 10px !important;
+  height: 10px !important;
+  min-width: 10px;
+  min-height: 10px;
+  border-width: 1.5px !important;
+}
+
+.sessionUnseenDot {
+  box-sizing: border-box;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--color-signal-green-500);
+  flex-shrink: 0;
+}
+
+.sessionLibraryCount {
   box-sizing: border-box;
   min-width: 17px;
   height: 17px;
@@ -190,53 +365,18 @@
   text-align: center;
   display: grid;
   place-items: center;
-  border: 2px solid var(--color-white);
-  pointer-events: none;
-}
-
-/* Same slot as library count — generating (blue + spinner) */
-.thumbGeneratingBadge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  z-index: 1;
-  box-sizing: border-box;
-  width: 17px;
-  height: 17px;
-  border-radius: 999px;
-  background: var(--color-blue-500);
-  border: 2px solid var(--color-white);
-  display: grid;
-  place-items: center;
-  color: var(--color-white);
-  pointer-events: none;
-}
-
-.thumbGeneratingSpinner {
-  width: 10px !important;
-  height: 10px !important;
-  min-width: 10px;
-  min-height: 10px;
-  border-width: 1.5px !important;
-}
-
-/* Same slot — new images, until session opened once */
-.thumbUnseenBadge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  z-index: 1;
-  box-sizing: border-box;
-  width: 17px;
-  height: 17px;
-  border-radius: 999px;
-  background: var(--color-signal-green-500);
-  border: 2px solid var(--color-white);
-  pointer-events: none;
-}
-
-.sessionThumbPlaceholderIcon {
   flex-shrink: 0;
+}
+
+.sessionTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
 }
 
 .sessionMeta {

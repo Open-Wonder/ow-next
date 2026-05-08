@@ -415,3 +415,11 @@ export const MOCK_AD_TEMPLATES = [
   { id: 'tpl-5', name: 'LinkedIn Cover', dimensions: '1584 x 396', image: 'https://picsum.photos/seed/tpl5/792/198' },
   { id: 'tpl-6', name: 'YouTube Thumbnail', dimensions: '1280 x 720', image: 'https://picsum.photos/seed/tpl6/640/360' },
 ];
+
+// ── Multi-market regions (Create / Market Adaption mode) ─────────
+export const MOCK_MARKETS = [
+  { id: 'south-africa', label: 'South Africa' },
+  { id: 'asia', label: 'Asia' },
+  { id: 'australia', label: 'Australia' },
+  { id: 'south-america', label: 'South America' },
+] as const;
