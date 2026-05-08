@@ -310,6 +310,88 @@
   cursor: not-allowed;
 }
 
+/* ── Loading slot: glow travels along outline via gradient angle (box does not rotate) ─── */
+
+@property --image-slot-glow-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.imageSlotOutline {
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  isolation: isolate;
+}
+
+/* Conic fill on the 1px ring only; angle animates so the highlight orbits without transforming the layer */
+.imageSlotOutline::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--image-slot-glow-angle),
+    rgba(200, 200, 200, 0.22) 0deg,
+    rgba(255, 255, 255, 0.92) 48deg,
+    rgba(180, 180, 180, 0.5) 96deg,
+    rgba(200, 200, 200, 0.16) 168deg,
+    transparent 228deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  animation: imageSlotGlowAngle 7s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes imageSlotGlowAngle {
+  to {
+    --image-slot-glow-angle: 360deg;
+  }
+}
+
+/* White behind type only; no drop-shadow */
+.imageSlotTextPill {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  max-width: calc(100% - 16px);
+  background: var(--color-white);
+  border: none;
+  border-radius: 0 18px 18px 18px;
+}
+
+.imageSlotGeneratingText {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-500);
+  text-align: center;
+  white-space: nowrap;
+  line-height: var(--line-height-tight);
+  pointer-events: none;
+}
+
 /* ── Loading Skeleton ────────────────────────────────────────────── */
 
 .skeleton {

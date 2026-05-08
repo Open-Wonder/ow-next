@@ -49,8 +49,14 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
         savedToLibrary: false,
       };
 
+      if (sessionId) {
+        dispatch({ type: 'SET_MODIFYING_IMAGE', payload: { active: true, sessionId } });
+      }
       setTimeout(() => {
         dispatch({ type: 'ADD_GENERATED_ASSET', payload, sessionId });
+        if (sessionId) {
+          dispatch({ type: 'SET_MODIFYING_IMAGE', payload: { active: false, sessionId } });
+        }
       }, 1200);
     },
     [dispatch, state.currentSession]
@@ -128,8 +134,10 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
   if (!state.currentSession) return null;
 
   const assets = state.currentSession.generatedAssets;
-  const isGenerating = state.generatingSessionIds.has(state.currentSession.id);
-  const skeletonCount = isGenerating ? 4 : 0;
+  const sessionId = state.currentSession.id;
+  const isGenerating = state.generatingSessionIds.has(sessionId);
+  const isModifying = state.modifyingSessionIds.has(sessionId);
+  const showBatchPlaceholder = isGenerating && assets.length > 0;
 
   return (
     <motion.div
@@ -162,6 +170,22 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
           null
         ) : (
           <div className={styles.assetGrid}>
+            {/*
+              Newest assets are first in state (see ADD_GENERATED_ASSET). Grid reads top-left → right:
+              loading slots first so they sit where the next image(s) will appear.
+            */}
+            {(showBatchPlaceholder || isModifying) && (
+              <div
+                className={`${styles.assetThumb} ${styles.imageSlotOutline}`}
+                style={{ aspectRatio: getAspectCss(state.imagineOptions.aspectRatio) }}
+                aria-busy
+                aria-label="Generating images"
+              >
+                <div className={styles.imageSlotTextPill}>
+                  <span className={styles.imageSlotGeneratingText}>Generating Images</span>
+                </div>
+              </div>
+            )}
             {assets.map((asset, i) => (
               <motion.div
                 key={asset.id}
@@ -211,21 +235,6 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
                 </div>
               </motion.div>
             ))}
-            {isGenerating &&
-              Array.from({ length: skeletonCount }).map((_, i) => (
-                <motion.div
-                  key={`skeleton-${i}`}
-                  className={styles.assetThumb}
-                  style={{ aspectRatio: getAspectCss(state.imagineOptions.aspectRatio) }}
-                  initial={{ opacity: 0.5 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className={styles.skeleton}>
-                    <div className={styles.skeletonShimmer} />
-                  </div>
-                </motion.div>
-              ))}
           </div>
         )}
       </div>

@@ -213,7 +213,8 @@ export default function ChatLanding() {
           type: 'SET_GENERATING_IMAGES',
           payload: { active: true, sessionId: generationSessionId },
         });
-        const delays = [10000, 10500, 11000, 11500];
+        /* Staggered mock arrivals: short enough to validate full-viewport loader + grid placeholder */
+        const delays = [2800, 3300, 3800, 4300];
         delays.forEach((delay, i) => {
           setTimeout(() => {
             const randomImg = MOCK_IMAGES[Math.floor(Math.random() * MOCK_IMAGES.length)];

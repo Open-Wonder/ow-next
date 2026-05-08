@@ -112,6 +112,8 @@ export interface ChatState {
   assetCollectionMembership: Record<string, string[]>;
   /** Session IDs with in-flight image generation (supports parallel sessions). */
   generatingSessionIds: Set<string>;
+  /** Session IDs with in-flight modify (single new image). */
+  modifyingSessionIds: Set<string>;
   /** Session IDs that completed generation but user hasn't opened them yet (green dot). */
   unseenCompletedSessionIds: Set<string>;
   /** Library assets currently generating HD upscale. */
@@ -153,6 +155,7 @@ type ChatAction =
   | { type: 'SET_MANAGER_MODAL'; payload: ManagerModalType }
   | { type: 'SET_MANAGER_MODAL_FORM_INIT'; payload: ManagerModalFormInit }
   | { type: 'SET_GENERATING_IMAGES'; payload: { active: boolean; sessionId?: string } }
+  | { type: 'SET_MODIFYING_IMAGE'; payload: { active: boolean; sessionId?: string } }
   | { type: 'SET_ACTIVE_LIBRARY_COLLECTION'; payload: string }
   | { type: 'TOGGLE_LIKED_ASSET'; payload: string }
   | {
@@ -204,6 +207,7 @@ const initialState: ChatState = {
   userLibraryCollections: [],
   assetCollectionMembership: {},
   generatingSessionIds: new Set(),
+  modifyingSessionIds: new Set(),
   unseenCompletedSessionIds: new Set(),
   hdGeneratingAssetIds: new Set(),
   hdReadyAssetIds: new Set(),
@@ -336,12 +340,15 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       nextUnseen.delete(id);
       const nextGenerating = new Set(state.generatingSessionIds);
       nextGenerating.delete(id);
+      const nextModifying = new Set(state.modifyingSessionIds);
+      nextModifying.delete(id);
       return {
         ...state,
         sessions: updatedSessions,
         currentSession: wasCurrent ? null : state.currentSession,
         unseenCompletedSessionIds: nextUnseen,
         generatingSessionIds: nextGenerating,
+        modifyingSessionIds: nextModifying,
       };
     }
 
@@ -351,6 +358,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         sessions: [],
         currentSession: null,
         generatingSessionIds: new Set(),
+        modifyingSessionIds: new Set(),
       };
 
     case 'SET_MODE': {
@@ -362,12 +370,15 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return { ...state, mode: newMode };
     }
 
-    case 'EXIT_MODE':
+    case 'EXIT_MODE': {
       // Full reset: go back to landing state, clear current session.
       // Use the session's mode so the correct tab is active (Imagine → Imagine, Chat → Chat).
       // Keep generatingSessionIds so sidebar still shows loading state
       // when user closes session while generation runs; green dot appears when it finishes.
       const exitMode = state.currentSession?.mode ?? 'imagine';
+      const exitSid = state.currentSession?.id;
+      const nextModifying = new Set(state.modifyingSessionIds);
+      if (exitSid) nextModifying.delete(exitSid);
       return {
         ...state,
         mode: exitMode,
@@ -378,7 +389,9 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         productOptions: initialState.productOptions,
         characterOptions: initialState.characterOptions,
         createOptions: initialState.createOptions,
+        modifyingSessionIds: nextModifying,
       };
+    }
 
     case 'SEND_MESSAGE': {
       let session = state.currentSession;
@@ -654,6 +667,17 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         generatingSessionIds: next,
         unseenCompletedSessionIds: nextUnseen,
       };
+    }
+
+    case 'SET_MODIFYING_IMAGE': {
+      const { active, sessionId: payloadSessionId } = action.payload;
+      const sid = payloadSessionId ?? state.currentSession?.id;
+      if (!sid) return state;
+
+      const next = new Set(state.modifyingSessionIds);
+      if (active) next.add(sid);
+      else next.delete(sid);
+      return { ...state, modifyingSessionIds: next };
     }
 
     default:
