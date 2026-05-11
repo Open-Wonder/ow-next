@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type ElementType } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  ArrowsLeftRight,
   Trash,
   CaretLeft,
   GearSix,
@@ -15,7 +16,7 @@ import {
   ChatCircle,
   Sparkle,
   Globe,
-  SquaresFour,
+  FunnelSimple,
   Plus,
 } from '@phosphor-icons/react';
 import cn from 'classnames';
@@ -28,6 +29,9 @@ import {
   LIBRARY_SIDEBAR_PRODUCT_STYLES,
   MOCK_LIBRARY_COLLECTIONS,
   MOCK_PRODUCT_STYLES,
+  MOCK_PRODUCTS,
+  MOCK_CHARACTERS,
+  MOCK_PRODUCT_IMAGE_COLLECTIONS,
   MOCK_LIBRARY_ASSETS,
   MOCK_USER,
   isLibraryAssetInBrandStylesSidebar,
@@ -136,7 +140,7 @@ const FILTER_ACTIVE_CLASS: Record<HistoryFilter, string> = {
 };
 
 /**
- * Order matches PromptModeTabs (Imagery → Market Adaption → Product → Character → Assistant),
+ * Order matches PromptModeTabs (Imagery → Product → Character → Assistant → Market Adaption),
  * with “All” first for clearing the filter.
  */
 const HISTORY_FILTER_ITEMS: {
@@ -147,7 +151,7 @@ const HISTORY_FILTER_ITEMS: {
 }[] = [
   {
     id: 'all',
-    Icon: SquaresFour,
+    Icon: FunnelSimple,
     title: 'All sessions',
     ariaLabel: 'Show all sessions',
   },
@@ -156,12 +160,6 @@ const HISTORY_FILTER_ITEMS: {
     Icon: Sparkle,
     title: 'Imagery',
     ariaLabel: 'Show imagery sessions only',
-  },
-  {
-    id: 'create',
-    Icon: Globe,
-    title: 'Market Adaption',
-    ariaLabel: 'Show Market Adaption sessions only',
   },
   {
     id: 'product',
@@ -180,6 +178,12 @@ const HISTORY_FILTER_ITEMS: {
     Icon: ChatCircle,
     title: 'Assistant',
     ariaLabel: 'Show assistant sessions only',
+  },
+  {
+    id: 'create',
+    Icon: Globe,
+    title: 'Market Adaption',
+    ariaLabel: 'Show Market Adaption sessions only',
   },
 ];
 
@@ -257,7 +261,7 @@ export default function HistorySidebar() {
     router.push('/');
   };
 
-  // Collection counts (liked assets per style / named collection)
+  // Collection counts (liked assets per style / named collection / product / character)
   const collectionCounts = Object.fromEntries(
     [
       LIBRARY_BRAND_STYLES_ALL_ID,
@@ -265,6 +269,8 @@ export default function HistorySidebar() {
       ...MOCK_PRODUCT_STYLES.map((s) => s.id),
       ...MOCK_LIBRARY_COLLECTIONS.map((c) => c.id),
       ...state.userLibraryCollections.map((c) => c.id),
+      ...MOCK_PRODUCTS.map((p) => p.id),
+      ...MOCK_CHARACTERS.map((c) => c.id),
     ].map((id) => [id, 0])
   ) as Record<string, number>;
   for (const asset of MOCK_LIBRARY_ASSETS) {
@@ -286,7 +292,37 @@ export default function HistorySidebar() {
       collectionCounts[asset.styleId] =
         (collectionCounts[asset.styleId] ?? 0) + 1;
     }
+    if ('productId' in asset && asset.productId) {
+      collectionCounts[asset.productId] =
+        (collectionCounts[asset.productId] ?? 0) + 1;
+    }
+    if ('characterId' in asset && asset.characterId) {
+      collectionCounts[asset.characterId] =
+        (collectionCounts[asset.characterId] ?? 0) + 1;
+    }
   }
+  // Also count session-generated assets that the user has saved to the library.
+  for (const session of state.sessions) {
+    for (const asset of session.generatedAssets) {
+      if (!asset.savedToLibrary) continue;
+      if (asset.productId) {
+        collectionCounts[asset.productId] =
+          (collectionCounts[asset.productId] ?? 0) + 1;
+      }
+      if (asset.characterId) {
+        collectionCounts[asset.characterId] =
+          (collectionCounts[asset.characterId] ?? 0) + 1;
+      }
+    }
+  }
+
+  // Only show products / characters that have at least one liked asset
+  const productsWithAssets = MOCK_PRODUCTS.filter(
+    (p) => (collectionCounts[p.id] ?? 0) > 0
+  );
+  const charactersWithAssets = MOCK_CHARACTERS.filter(
+    (c) => (collectionCounts[c.id] ?? 0) > 0
+  );
 
   const brandStyleRows = [...MOCK_IMAGE_STYLES, ...LIBRARY_SIDEBAR_PRODUCT_STYLES];
 
@@ -355,6 +391,78 @@ export default function HistorySidebar() {
               </button>
             ))}
           </div>
+          {productsWithAssets.length > 0 && (
+            <>
+              <h3 className={cn(styles.listHeading, styles.listHeadingSection)}>Products</h3>
+              <div className={styles.collectionSection}>
+                {productsWithAssets.map((product) => (
+                  <button
+                    key={product.id}
+                    type="button"
+                    className={cn(
+                      styles.collectionItem,
+                      state.activeLibraryCollection === product.id &&
+                        styles.collectionItemActive
+                    )}
+                    onClick={() => handleCollectionSelect(product.id)}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={product.image} alt="" className={styles.collectionThumb} />
+                    <span className={styles.collectionLabel}>{product.name}</span>
+                    <span className={styles.collectionCount}>
+                      {collectionCounts[product.id] ?? 0}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+          {charactersWithAssets.length > 0 && (
+            <>
+              <h3 className={cn(styles.listHeading, styles.listHeadingSection)}>Characters</h3>
+              <div className={styles.collectionSection}>
+                {charactersWithAssets.map((character) => (
+                  <button
+                    key={character.id}
+                    type="button"
+                    className={cn(
+                      styles.collectionItem,
+                      state.activeLibraryCollection === character.id &&
+                        styles.collectionItemActive
+                    )}
+                    onClick={() => handleCollectionSelect(character.id)}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={character.image} alt="" className={styles.collectionThumb} />
+                    <span className={styles.collectionLabel}>{character.name}</span>
+                    <span className={styles.collectionCount}>
+                      {collectionCounts[character.id] ?? 0}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+          <h3 className={cn(styles.listHeading, styles.listHeadingSection)}>Product and Images</h3>
+          <div className={styles.collectionSection}>
+            {MOCK_PRODUCT_IMAGE_COLLECTIONS.map((collection) => (
+              <button
+                key={collection.id}
+                type="button"
+                className={cn(
+                  styles.collectionItem,
+                  state.activeLibraryCollection === collection.id &&
+                    styles.collectionItemActive
+                )}
+                onClick={() => handleCollectionSelect(collection.id)}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={collection.image} alt="" className={styles.collectionThumb} />
+                <span className={styles.collectionLabel}>{collection.name}</span>
+                <span className={styles.collectionCount}>{collection.assetIds.length}</span>
+              </button>
+            ))}
+          </div>
           <h3 className={cn(styles.listHeading, styles.listHeadingSection)}>Collections</h3>
           <div className={styles.collectionSection}>
             {[...MOCK_LIBRARY_COLLECTIONS, ...state.userLibraryCollections].map(
@@ -416,7 +524,7 @@ export default function HistorySidebar() {
                           >
                             <Icon
                               size={17}
-                              weight={active ? 'bold' : 'regular'}
+                              weight="regular"
                               aria-hidden
                             />
                           </button>
@@ -474,9 +582,17 @@ export default function HistorySidebar() {
                                 styles.sessionModeBadge,
                                 modeIcon.badgeClass
                               )}
-                              aria-label={`${MODE_LABELS_SHORT[session.mode]} session`}
+                              aria-label={`${MODE_LABELS_SHORT[session.mode]}${session.isSwapSession ? ' swap' : ''} session`}
                             >
                               <ModeIcon size={14} weight="regular" aria-hidden />
+                              {session.isSwapSession && (
+                                <span
+                                  className={styles.sessionModeBadgeSwapDot}
+                                  aria-hidden
+                                >
+                                  <ArrowsLeftRight size={8} weight="bold" />
+                                </span>
+                              )}
                             </span>
                             <span className={styles.sessionTextBlock}>
                               <span className={styles.sessionTitleRow}>

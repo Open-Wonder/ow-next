@@ -203,6 +203,16 @@ export default function EditCanvas({ embedded }: EditCanvasProps = {}) {
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={asset.url} alt={asset.prompt} className={styles.thumbImage} />
+                {asset.tag && (
+                  <span
+                    className={cn(
+                      styles.assetTag,
+                      asset.tag === 'Original' && styles.assetTagOriginal
+                    )}
+                  >
+                    {asset.tag}
+                  </span>
+                )}
                 {asset.savedToLibrary && (
                   <span className={styles.savedHeartOnly} aria-hidden>
                     <Heart size={14} weight="regular" />

@@ -115,53 +115,53 @@
 }
 
 .historyFilterBtnActiveImagine {
-  background: color-mix(in srgb, #3730a3 10%, transparent);
-  color: #3730a3;
+  background: color-mix(in srgb, #7c3aed 10%, transparent);
+  color: #7c3aed;
 }
 
 .historyFilterBtnActiveImagine:hover {
-  background: color-mix(in srgb, #3730a3 16%, transparent);
-  color: #3730a3;
+  background: color-mix(in srgb, #7c3aed 16%, transparent);
+  color: #7c3aed;
 }
 
 .historyFilterBtnActiveCreate {
-  background: color-mix(in srgb, #0f766e 10%, transparent);
-  color: #0f766e;
+  background: color-mix(in srgb, #4f46e5 10%, transparent);
+  color: #4f46e5;
 }
 
 .historyFilterBtnActiveCreate:hover {
-  background: color-mix(in srgb, #0f766e 16%, transparent);
-  color: #0f766e;
+  background: color-mix(in srgb, #4f46e5 16%, transparent);
+  color: #4f46e5;
 }
 
 .historyFilterBtnActiveProduct {
-  background: color-mix(in srgb, #9a3412 10%, transparent);
-  color: #9a3412;
+  background: color-mix(in srgb, #16a34a 10%, transparent);
+  color: #16a34a;
 }
 
 .historyFilterBtnActiveProduct:hover {
-  background: color-mix(in srgb, #9a3412 16%, transparent);
-  color: #9a3412;
+  background: color-mix(in srgb, #16a34a 16%, transparent);
+  color: #16a34a;
 }
 
 .historyFilterBtnActiveCharacter {
-  background: color-mix(in srgb, #a21caf 10%, transparent);
-  color: #a21caf;
+  background: #fff4c1;
+  color: #a26c00;
 }
 
 .historyFilterBtnActiveCharacter:hover {
-  background: color-mix(in srgb, #a21caf 16%, transparent);
-  color: #a21caf;
+  background: #fceba0;
+  color: #a26c00;
 }
 
 .historyFilterBtnActiveAssistant {
-  background: color-mix(in srgb, #1d4ed8 10%, transparent);
-  color: #1d4ed8;
+  background: color-mix(in srgb, #db2777 10%, transparent);
+  color: #db2777;
 }
 
 .historyFilterBtnActiveAssistant:hover {
-  background: color-mix(in srgb, #1d4ed8 16%, transparent);
-  color: #1d4ed8;
+  background: color-mix(in srgb, #db2777 16%, transparent);
+  color: #db2777;
 }
 
 .historyNewBtn {
@@ -253,38 +253,54 @@
 
 /* Mode chip — circular; colors mirror PromptModeTabs (ChatInput.module.css) */
 .sessionModeBadge {
+  position: relative;
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  width: 27px;
+  height: 27px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.sessionModeBadgeSwapDot {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-white);
+  border: 1.5px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
 .sessionModeBadgeImagine {
-  background: color-mix(in srgb, #3730a3 10%, transparent);
-  color: #3730a3;
+  background: color-mix(in srgb, #7c3aed 10%, transparent);
+  color: #7c3aed;
 }
 
 .sessionModeBadgeCreate {
-  background: color-mix(in srgb, #0f766e 10%, transparent);
-  color: #0f766e;
+  background: color-mix(in srgb, #4f46e5 10%, transparent);
+  color: #4f46e5;
 }
 
 .sessionModeBadgeProduct {
-  background: color-mix(in srgb, #9a3412 10%, transparent);
-  color: #9a3412;
+  background: color-mix(in srgb, #16a34a 10%, transparent);
+  color: #16a34a;
 }
 
 .sessionModeBadgeCharacter {
-  background: color-mix(in srgb, #a21caf 10%, transparent);
-  color: #a21caf;
+  background: #fff4c1;
+  color: #a26c00;
 }
 
 .sessionModeBadgeAssistant {
-  background: color-mix(in srgb, #1d4ed8 10%, transparent);
-  color: #1d4ed8;
+  background: color-mix(in srgb, #db2777 10%, transparent);
+  color: #db2777;
 }
 
 .sessionModeBadgeIdle {

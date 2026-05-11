@@ -19,7 +19,10 @@ import styles from './layout.module.css';
 function CreateView() {
   const { state } = useChat();
   const hasImageSession =
-    (state.mode === 'imagine' || state.mode === 'product' || state.mode === 'character') &&
+    (state.mode === 'imagine' ||
+      state.mode === 'product' ||
+      state.mode === 'character' ||
+      state.mode === 'create') &&
     state.currentSession &&
     (state.currentSession.messages.length > 0 || state.currentSession.generatedAssets.length > 0);
   const showSplitCanvas =

@@ -4,6 +4,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  ArrowsLeftRight,
   Heart,
   MagnifyingGlass,
   DotsThree,
@@ -18,12 +19,16 @@ import {
   CircleNotch,
 } from '@phosphor-icons/react';
 import cn from 'classnames';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   LIBRARY_BRAND_STYLES_ALL_ID,
+  MOCK_IMAGES,
   MOCK_LIBRARY_ASSETS,
   MOCK_LIBRARY_COLLECTIONS,
   MOCK_PRODUCTS,
+  MOCK_CHARACTERS,
+  MOCK_PRODUCT_IMAGE_COLLECTIONS,
   MOCK_PRODUCT_STYLES,
   isLibraryAssetInBrandStylesSidebar,
 } from '@/lib/mock-data';
@@ -31,6 +36,7 @@ import ContextMenu, { type MenuItem } from '@/components/common/ContextMenu/Cont
 import { Button } from '@/components/common/Button';
 import MentionPopover, { type MentionProduct } from '@/components/chat/ChatInput/MentionPopover';
 import AssetLightbox from '@/components/chat/AssetLightbox/AssetLightbox';
+import SwapProductOverlay from '@/components/library/SwapProductOverlay/SwapProductOverlay';
 import { useChat } from '@/lib/chat-context';
 import { countLikedAssetsInCollection, getCollectionIdsForAsset } from '@/lib/library-collections';
 import styles from './LibraryView.module.css';
@@ -39,6 +45,7 @@ import styles from './LibraryView.module.css';
 
 export default function LibraryView() {
   const { state, dispatch } = useChat();
+  const router = useRouter();
   const styleFilter = state.activeLibraryCollection;
   const [productFilter, setProductFilter] = useState('');
   const [search, setSearch] = useState('');
@@ -61,6 +68,10 @@ export default function LibraryView() {
   } | null>(null);
   const [libraryModifyPrompt, setLibraryModifyPrompt] = useState('');
   const libraryModifyInputRef = useRef<HTMLInputElement>(null);
+  /** Asset whose product the user is currently swapping (Library context menu → Swap Product). */
+  const [swapOverlayAsset, setSwapOverlayAsset] = useState<
+    (typeof filteredAssets)[number] | null
+  >(null);
   const [newCollectionDraft, setNewCollectionDraft] = useState(false);
   const [newCollectionNameInput, setNewCollectionNameInput] = useState('');
   const hdGenerationTimeoutsRef = useRef<Map<string, number>>(new Map());
@@ -85,12 +96,59 @@ export default function LibraryView() {
     setProductFilter('');
   }, [styleFilter]);
 
+  // Session-generated assets the user has saved to the library, converted to a
+  // shape compatible with MOCK_LIBRARY_ASSETS so the same filters / renderers apply.
+  const sessionLibraryAssets = useMemo(() => {
+    type LibraryAsset = (typeof MOCK_LIBRARY_ASSETS)[number];
+    const out: LibraryAsset[] = [];
+    for (const session of state.sessions) {
+      for (const asset of session.generatedAssets) {
+        if (!asset.savedToLibrary) continue;
+        const base = {
+          id: asset.id,
+          url: asset.url,
+          name: asset.prompt?.slice(0, 80) || 'Generated image',
+          type: 'image' as const,
+          folderId: asset.folderIds?.[0] ?? 'fold-1',
+          styleId: asset.productId ? 'style-3' : asset.characterId ? 'style-4' : 'style-1',
+          liked: true,
+          creativeMode: session.mode,
+          aspectRatio: asset.aspectRatio ?? '1:1',
+          createdAt: asset.createdAt ?? new Date().toISOString(),
+          libraryCollectionId: 'collection-summer-campaign',
+        };
+        if (asset.productId) {
+          out.push({ ...base, productId: asset.productId, productStyleId: 'pstyle-1' } as LibraryAsset);
+        } else if (asset.characterId) {
+          out.push({ ...base, characterId: asset.characterId, locationId: 'cloc-1' } as LibraryAsset);
+        } else {
+          out.push(base as LibraryAsset);
+        }
+      }
+    }
+    return out;
+  }, [state.sessions]);
+
   // Filtered assets, sorted by most recent first (only show liked assets)
   const filteredAssets = useMemo(() => {
-    let result = [...MOCK_LIBRARY_ASSETS];
+    // Product-image showcase collections bypass the liked filter so they always
+    // render their seeded assets.
+    const productImageCollection = MOCK_PRODUCT_IMAGE_COLLECTIONS.find(
+      (c) => c.id === styleFilter
+    );
+    if (productImageCollection) {
+      const allowed = new Set<string>(productImageCollection.assetIds);
+      const showcase = MOCK_LIBRARY_ASSETS.filter((a) => allowed.has(a.id));
+      const q = search.trim().toLowerCase();
+      return q
+        ? showcase.filter((a) => a.name.toLowerCase().includes(q))
+        : showcase;
+    }
 
-    // Only show liked
-    result = result.filter((a) => likedIds.has(a.id));
+    let result = [
+      ...MOCK_LIBRARY_ASSETS.filter((a) => likedIds.has(a.id)),
+      ...sessionLibraryAssets,
+    ];
 
     // Collection filter
     if (styleFilter) {
@@ -100,9 +158,19 @@ export default function LibraryView() {
         const isNamedLibraryCollection =
           MOCK_LIBRARY_COLLECTIONS.some((c) => c.id === styleFilter) ||
           state.userLibraryCollections.some((c) => c.id === styleFilter);
+        const isProductId = MOCK_PRODUCTS.some((p) => p.id === styleFilter);
+        const isCharacterId = MOCK_CHARACTERS.some((c) => c.id === styleFilter);
         if (isNamedLibraryCollection) {
           result = result.filter((a) =>
             getCollectionIdsForAsset(a.id, state.assetCollectionMembership).includes(styleFilter)
+          );
+        } else if (isProductId) {
+          result = result.filter(
+            (a) => 'productId' in a && a.productId === styleFilter
+          );
+        } else if (isCharacterId) {
+          result = result.filter(
+            (a) => 'characterId' in a && a.characterId === styleFilter
           );
         } else {
           const isProductStyle = MOCK_PRODUCT_STYLES.some((s) => s.id === styleFilter);
@@ -132,10 +200,105 @@ export default function LibraryView() {
     result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return result;
-  }, [styleFilter, search, likedIds, productFilter, state.assetCollectionMembership, state.userLibraryCollections]);
+  }, [
+    styleFilter,
+    search,
+    likedIds,
+    productFilter,
+    state.assetCollectionMembership,
+    state.userLibraryCollections,
+    sessionLibraryAssets,
+  ]);
 
   const isProductCollection = MOCK_PRODUCT_STYLES.some((s) => s.id === styleFilter);
   const productPopoverOpen = isProductCollection && searchFocused;
+
+  const handleSwapConfirm = useCallback(
+    (selectedProductIds: string[]) => {
+      const asset = swapOverlayAsset;
+      if (!asset || selectedProductIds.length === 0) return;
+      const sourceProduct = MOCK_PRODUCTS.find(
+        (p) => p.id === ('productId' in asset ? asset.productId : undefined)
+      );
+      if (!sourceProduct) return;
+      const swapProducts = selectedProductIds
+        .map((id) => MOCK_PRODUCTS.find((p) => p.id === id))
+        .filter((p): p is (typeof MOCK_PRODUCTS)[number] => Boolean(p));
+      if (swapProducts.length === 0) return;
+
+      const baseTime = Date.now();
+      const sessionId = `session-${baseTime}-swap-${asset.id}`;
+      const message = `Swap ${sourceProduct.name} with ${swapProducts
+        .map((p) => p.name)
+        .join(', ')} in ${asset.name}`;
+
+      dispatch({
+        type: 'SEND_MESSAGE',
+        payload: {
+          id: `msg-${baseTime}`,
+          role: 'user' as const,
+          content: message,
+          timestamp: new Date().toISOString(),
+        },
+        sessionId,
+        isSwapSession: true,
+      });
+
+      dispatch({
+        type: 'ADD_GENERATED_ASSET',
+        payload: {
+          id: `asset-orig-${sessionId}`,
+          url: asset.url,
+          prompt: message,
+          type: 'image' as const,
+          aspectRatio: ('aspectRatio' in asset && asset.aspectRatio) || '1:1',
+          savedToLibrary: false,
+          createdAt: new Date().toISOString(),
+          tag: 'Original',
+          productId: sourceProduct.id,
+        },
+        sessionId,
+      });
+
+      dispatch({
+        type: 'SET_GENERATING_IMAGES',
+        payload: { active: true, sessionId },
+      });
+
+      swapProducts.forEach((swapProduct, idx) => {
+        const isLast = idx === swapProducts.length - 1;
+        const delay = 1500 + idx * 700;
+        setTimeout(() => {
+          const randomImg = MOCK_IMAGES[Math.floor(Math.random() * MOCK_IMAGES.length)];
+          dispatch({
+            type: 'ADD_GENERATED_ASSET',
+            payload: {
+              id: `asset-${sessionId}-${swapProduct.id}`,
+              url: randomImg.url,
+              prompt: message,
+              type: 'image' as const,
+              aspectRatio: ('aspectRatio' in asset && asset.aspectRatio) || '1:1',
+              savedToLibrary: false,
+              createdAt: new Date().toISOString(),
+              tag: swapProduct.name,
+              productId: swapProduct.id,
+            },
+            sessionId,
+          });
+          if (isLast) {
+            dispatch({
+              type: 'SET_GENERATING_IMAGES',
+              payload: { active: false, sessionId },
+            });
+          }
+        }, delay);
+      });
+
+      setSwapOverlayAsset(null);
+      router.push('/');
+    },
+    [swapOverlayAsset, dispatch, router]
+  );
 
   const productMentionItems: MentionProduct[] = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -342,6 +505,8 @@ export default function LibraryView() {
         </div>
       );
 
+      const canSwap = 'productId' in asset && Boolean(asset.productId);
+
       return [
         {
           id: 'modify',
@@ -356,6 +521,19 @@ export default function LibraryView() {
             }
           },
         },
+        ...(canSwap
+          ? [
+              {
+                id: 'swap-product',
+                label: 'Swap Product',
+                icon: <ArrowsLeftRight size={16} />,
+                onAction: () => {
+                  setSwapOverlayAsset(asset);
+                  setContextMenu(null);
+                },
+              } satisfies MenuItem,
+            ]
+          : []),
         {
           id: 'add-to-collection',
           label: 'Add to Collection',
@@ -676,6 +854,25 @@ export default function LibraryView() {
           </AnimatePresence>,
           document.body
         )}
+
+      <SwapProductOverlay
+        open={swapOverlayAsset !== null}
+        asset={
+          swapOverlayAsset
+            ? {
+                id: swapOverlayAsset.id,
+                name: swapOverlayAsset.name,
+                url: swapOverlayAsset.url,
+                productId:
+                  'productId' in swapOverlayAsset
+                    ? swapOverlayAsset.productId
+                    : undefined,
+              }
+            : null
+        }
+        onClose={() => setSwapOverlayAsset(null)}
+        onConfirm={handleSwapConfirm}
+      />
     </div>
   );
 }

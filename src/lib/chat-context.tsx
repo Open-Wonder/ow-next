@@ -36,6 +36,18 @@ export interface GeneratedAsset {
   aspectRatio?: string;
   savedToLibrary: boolean;
   folderIds?: string[];
+  /** Product used to generate this asset (Product mode). */
+  productId?: string;
+  /** Character used to generate this asset (Character mode). */
+  characterId?: string;
+  /** ISO timestamp when the asset was generated. */
+  createdAt?: string;
+  /**
+   * Short label rendered as a chip on the asset thumbnail.
+   * In Market Adaption sessions this is either "Original" (the source asset)
+   * or a market label such as "South Africa".
+   */
+  tag?: string;
 }
 
 export interface ChatSession {
@@ -51,6 +63,8 @@ export interface ChatSession {
   styleId?: string;
   /** Aspect ratio used when session was created. */
   aspectRatio?: string;
+  /** Marks a session generated via the Library "Swap Product" flow — renders a small swap indicator on the mode badge. */
+  isSwapSession?: boolean;
 }
 
 export interface ImagineOptions {
@@ -138,7 +152,7 @@ type ChatAction =
   | { type: 'SET_ACTIVE_VIEW'; payload: ActiveView }
   | { type: 'SET_MODE'; payload: CreativeMode }
   /** Optional `sessionId` when creating a new session (keeps client timers aligned with the session row). */
-  | { type: 'SEND_MESSAGE'; payload: ChatMessage; sessionId?: string }
+  | { type: 'SEND_MESSAGE'; payload: ChatMessage; sessionId?: string; isSwapSession?: boolean }
   | { type: 'ADD_ASSISTANT_MESSAGE'; payload: ChatMessage }
   | { type: 'ADD_GENERATED_ASSET'; payload: GeneratedAsset; sessionId?: string }
   | { type: 'SAVE_ASSET_TO_LIBRARY'; payload: { assetId: string; folderId: string } }
@@ -404,6 +418,13 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
 
     case 'SEND_MESSAGE': {
       let session = state.currentSession;
+      // When the caller passes an explicit sessionId, route to that session
+      // (existing one in state.sessions or a brand-new one). Lets flows like
+      // Market Adaption create multiple sessions back-to-back without each
+      // dispatch falling back to state.currentSession.
+      if (action.sessionId && session?.id !== action.sessionId) {
+        session = state.sessions.find((s) => s.id === action.sessionId) ?? null;
+      }
       if (!session) {
         const styleId =
           state.mode === 'imagine' || state.mode === 'create'
@@ -421,6 +442,9 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         let created = createSession(state.mode, styleId, aspectRatio);
         if (action.sessionId) {
           created = { ...created, id: action.sessionId };
+        }
+        if (action.isSwapSession) {
+          created = { ...created, isSwapSession: true };
         }
         session = created;
       }
@@ -608,11 +632,8 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
     case 'SET_CHARACTER_OPTIONS':
       return { ...state, characterOptions: { ...state.characterOptions, ...action.payload } };
 
-    case 'SET_CREATE_OPTIONS': {
-      const next = { ...state.createOptions, ...action.payload };
-      if (next.markets.length === 0) next.sourceAssetIds = [];
-      return { ...state, createOptions: next };
-    }
+    case 'SET_CREATE_OPTIONS':
+      return { ...state, createOptions: { ...state.createOptions, ...action.payload } };
 
     case 'LOAD_SESSIONS':
       return { ...state, sessions: action.payload };

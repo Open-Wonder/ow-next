@@ -90,6 +90,32 @@ export const MOCK_LIBRARY_COLLECTIONS = [
   { id: 'collection-product-release-march', name: 'Product Release March' },
 ] as const;
 
+/**
+ * Showcase product-image collections — each maps to a product name with a fixed
+ * set of seeded library asset ids. Renders in the "Product and Images" section
+ * of the library sidebar and bypasses the liked filter (always populated).
+ */
+export const MOCK_PRODUCT_IMAGE_COLLECTIONS = [
+  {
+    id: 'pcoll-wireless-headphones',
+    name: 'Wireless Headphones',
+    image: 'https://picsum.photos/seed/prod1/200/200',
+    assetIds: ['asset-3', 'asset-7', 'asset-11', 'asset-15', 'asset-19', 'asset-23'],
+  },
+  {
+    id: 'pcoll-smart-watch',
+    name: 'Smart Watch',
+    image: 'https://picsum.photos/seed/prod2/200/200',
+    assetIds: ['asset-2', 'asset-6', 'asset-10', 'asset-14'],
+  },
+  {
+    id: 'pcoll-running-shoes',
+    name: 'Running Shoes',
+    image: 'https://picsum.photos/seed/prod3/200/200',
+    assetIds: ['asset-4', 'asset-8', 'asset-12', 'asset-16', 'asset-20'],
+  },
+] as const;
+
 export const MOCK_LIBRARY_ASSETS = Array.from({ length: 24 }, (_, i) => {
   const arIdx = i % ASPECT_RATIOS_LIB.length;
   const styleId = STYLE_IDS[i % STYLE_IDS.length];
@@ -385,16 +411,38 @@ export const MOCK_CHARACTER_LOCATIONS = [
 ];
 
 // ── Product Mock ────────────────────────────────────────────────────
+/**
+ * `groupId` defines which products can be swapped for one another in the
+ * Library "Swap Product" flow. Categories stay free-form descriptive labels;
+ * groups are explicit so a swap target list is always meaningful.
+ */
 export const MOCK_PRODUCTS = [
-  { id: 'prod-1', name: 'Wireless Headphones', category: 'Electronics', image: 'https://picsum.photos/seed/prod1/400/400' },
-  { id: 'prod-2', name: 'Smart Watch', category: 'Electronics', image: 'https://picsum.photos/seed/prod2/400/400' },
-  { id: 'prod-3', name: 'Running Shoes', category: 'Footwear', image: 'https://picsum.photos/seed/prod3/400/400' },
-  { id: 'prod-4', name: 'Toothpaste Premium', category: 'Health', image: 'https://picsum.photos/seed/prod4/400/400' },
-  { id: 'prod-5', name: 'Organic Face Cream', category: 'Beauty', image: 'https://picsum.photos/seed/prod5/400/400' },
-  { id: 'prod-6', name: 'Leather Backpack', category: 'Accessories', image: 'https://picsum.photos/seed/prod6/400/400' },
-  { id: 'prod-7', name: 'Coffee Maker Pro', category: 'Home', image: 'https://picsum.photos/seed/prod7/400/400' },
-  { id: 'prod-8', name: 'Yoga Mat Deluxe', category: 'Fitness', image: 'https://picsum.photos/seed/prod8/400/400' },
+  { id: 'prod-1', name: 'Wireless Headphones', category: 'Electronics', groupId: 'tech-electronics', image: 'https://picsum.photos/seed/prod1/400/400' },
+  { id: 'prod-2', name: 'Smart Watch', category: 'Electronics', groupId: 'tech-electronics', image: 'https://picsum.photos/seed/prod2/400/400' },
+  { id: 'prod-3', name: 'Running Shoes', category: 'Footwear', groupId: 'active-lifestyle', image: 'https://picsum.photos/seed/prod3/400/400' },
+  { id: 'prod-4', name: 'Toothpaste Premium', category: 'Health', groupId: 'personal-care', image: 'https://picsum.photos/seed/prod4/400/400' },
+  { id: 'prod-5', name: 'Organic Face Cream', category: 'Beauty', groupId: 'personal-care', image: 'https://picsum.photos/seed/prod5/400/400' },
+  { id: 'prod-6', name: 'Leather Backpack', category: 'Accessories', groupId: 'home-accessories', image: 'https://picsum.photos/seed/prod6/400/400' },
+  { id: 'prod-7', name: 'Coffee Maker Pro', category: 'Home', groupId: 'home-accessories', image: 'https://picsum.photos/seed/prod7/400/400' },
+  { id: 'prod-8', name: 'Yoga Mat Deluxe', category: 'Fitness', groupId: 'active-lifestyle', image: 'https://picsum.photos/seed/prod8/400/400' },
 ];
+
+/** Human-readable labels for product groupIds (used in the Swap overlay). */
+export const PRODUCT_GROUP_LABELS: Record<string, string> = {
+  'tech-electronics': 'Tech & Electronics',
+  'personal-care': 'Personal Care',
+  'active-lifestyle': 'Active Lifestyle',
+  'home-accessories': 'Home & Accessories',
+};
+
+/** Returns all other products that share the source product's groupId. */
+export function getSwapCandidatesForProduct(productId: string) {
+  const source = MOCK_PRODUCTS.find((p) => p.id === productId);
+  if (!source) return [];
+  return MOCK_PRODUCTS.filter(
+    (p) => p.groupId === source.groupId && p.id !== source.id
+  );
+}
 
 // ── Character / Testimonial Mock ────────────────────────────────────
 export const MOCK_CHARACTERS = [
@@ -418,8 +466,44 @@ export const MOCK_AD_TEMPLATES = [
 
 // ── Multi-market regions (Create / Market Adaption mode) ─────────
 export const MOCK_MARKETS = [
-  { id: 'south-africa', label: 'South Africa' },
-  { id: 'asia', label: 'Asia' },
-  { id: 'australia', label: 'Australia' },
-  { id: 'south-america', label: 'South America' },
+  {
+    id: 'south-africa',
+    label: 'South Africa',
+    description: 'English-first copy, ZAR pricing, locally relevant imagery and seasonal cues from the Southern Hemisphere.',
+    previews: [
+      'https://picsum.photos/seed/market-za-1/240/180',
+      'https://picsum.photos/seed/market-za-2/240/180',
+      'https://picsum.photos/seed/market-za-3/240/180',
+    ],
+  },
+  {
+    id: 'asia',
+    label: 'Asia',
+    description: 'Multilingual variants (EN / JA / KO / ZH), mobile-first crops and culturally adapted color palettes.',
+    previews: [
+      'https://picsum.photos/seed/market-asia-1/240/180',
+      'https://picsum.photos/seed/market-asia-2/240/180',
+      'https://picsum.photos/seed/market-asia-3/240/180',
+    ],
+  },
+  {
+    id: 'australia',
+    label: 'Australia',
+    description: 'English-AU copy, AUD pricing, outdoor lifestyle visuals and Southern Hemisphere seasonality.',
+    previews: [
+      'https://picsum.photos/seed/market-au-1/240/180',
+      'https://picsum.photos/seed/market-au-2/240/180',
+      'https://picsum.photos/seed/market-au-3/240/180',
+    ],
+  },
+  {
+    id: 'south-america',
+    label: 'South America',
+    description: 'Spanish & Portuguese variants, regional pricing and vibrant lifestyle imagery for LATAM audiences.',
+    previews: [
+      'https://picsum.photos/seed/market-sa-1/240/180',
+      'https://picsum.photos/seed/market-sa-2/240/180',
+      'https://picsum.photos/seed/market-sa-3/240/180',
+    ],
+  },
 ] as const;

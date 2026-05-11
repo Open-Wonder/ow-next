@@ -26,17 +26,17 @@ const TAB_ACTIVE_CLASS: Partial<Record<CreativeMode, string>> = {
   assistant: styles.promptModeTabActiveAssistant,
 };
 
-/** Order: Imagery, Market Adaption, Product, Character, Assistant */
+/** Order: Imagery, Product, Character, Assistant, Market Adaption */
 const PROMPT_TABS: {
   id: CreativeMode;
   label: string;
   Icon: PhosphorIcon;
 }[] = [
   { id: 'imagine', label: 'Imagery', Icon: Sparkle },
-  { id: 'create', label: 'Market Adaption', Icon: Globe },
   { id: 'product', label: 'Product', Icon: Package },
   { id: 'character', label: 'Character', Icon: UserCircle },
   { id: 'assistant', label: 'Assistant', Icon: ChatCircle },
+  { id: 'create', label: 'Market Adaption', Icon: Globe },
 ];
 
 export default function PromptModeTabs() {
@@ -121,7 +121,6 @@ export default function PromptModeTabs() {
       {visibleTabs.map((tab) => {
         const selected = tab.id === effectiveSelected;
         const Icon = tab.Icon;
-        const iconWeight = selected ? 'bold' : 'regular';
         return (
           <button
             key={tab.id}
@@ -153,7 +152,7 @@ export default function PromptModeTabs() {
               )}
             >
               <span className={styles.promptModeTabIcon} aria-hidden>
-                <Icon size={TAB_ICON_SIZE} weight={iconWeight} />
+                <Icon size={TAB_ICON_SIZE} weight="regular" />
               </span>
               <span className={styles.promptModeTabLabel}>{tab.label}</span>
             </span>

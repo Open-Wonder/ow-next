@@ -12,14 +12,13 @@ import {
   MOCK_IMAGE_STYLES,
   MOCK_PRODUCT_STYLES,
   MOCK_CHARACTER_LOCATIONS,
-  MOCK_AD_TEMPLATES,
   MOCK_LIBRARY_ASSETS,
+  MOCK_MARKETS,
 } from '@/lib/mock-data';
 import { Button } from '@/components/common/Button';
 import CustomSelect from '@/components/common/Select';
 import Box from '@/components/common/Box';
 import PromptEditor, { type PromptEditorRef } from '@/components/chat/ChatInput/PromptEditor';
-import MarketsMultiSelect from '@/components/chat/ChatInput/MarketsMultiSelect';
 import CreateModeImageField from '@/components/chat/ChatInput/CreateModeImageField';
 import AspectRatioSelector from '@/components/common/AspectRatioSelector';
 import {
@@ -83,7 +82,8 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
         : mode === 'character'
           ? !!state.characterOptions.location
           : mode === 'create'
-            ? state.createOptions.markets.length > 0 && state.createOptions.sourceAssetIds.length > 0
+            ? state.createOptions.sourceAssetIds.length > 0 &&
+              state.createOptions.markets.length > 0
             : true;
   const canSendTextarea =
     mode === 'create'
@@ -96,8 +96,8 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
     if (mode === 'imagine' && !state.imagineOptions.brandStyle) return;
     if (mode === 'product' && !state.productOptions.shotStyle) return;
     if (mode === 'character' && !state.characterOptions.location) return;
-    if (mode === 'create' && state.createOptions.markets.length === 0) return;
     if (mode === 'create' && state.createOptions.sourceAssetIds.length === 0) return;
+    if (mode === 'create' && state.createOptions.markets.length === 0) return;
     if (usePromptEditorFor) {
       const text = promptEditorRef.current?.getText() ?? '';
       const trimmed = text.trim();
@@ -113,14 +113,17 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
     } else {
       if (mode === 'create') {
         const chosenIds = state.createOptions.sourceAssetIds;
-        if (chosenIds.length === 0) return;
+        const chosenMarkets = state.createOptions.markets;
+        if (chosenIds.length === 0 || chosenMarkets.length === 0) return;
         const names = chosenIds
           .map((id) => MOCK_LIBRARY_ASSETS.find((a) => a.id === id)?.name)
           .filter(Boolean) as string[];
-        const message =
-          names.length > 0
-            ? `Adapt for selected markets: ${names.join(', ')}`
-            : 'Adapt selected images for selected markets';
+        const marketLabels = chosenMarkets
+          .map((id) => MOCK_MARKETS.find((m) => m.id === id)?.label)
+          .filter(Boolean) as string[];
+        const message = `Adapt ${
+          names.length > 0 ? names.join(', ') : 'selected images'
+        } for ${marketLabels.join(', ')}`;
         const accepted = onSend?.(message);
         if (accepted !== false) {
           // keep sources + markets for iteration unless cleared elsewhere
@@ -228,8 +231,9 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
           </div>
         </div>
 
-        {/* Picker bar (mode-specific visual chips; assistant shows empty placeholder for consistent height) */}
-        {mode !== 'idle' && (
+        {/* Picker bar (mode-specific visual chips; assistant shows empty placeholder for consistent height).
+            Create mode handles send entirely inside the Explore overlay, so it skips the picker bar. */}
+        {mode !== 'idle' && mode !== 'create' && (
           <div className={styles.pickerBar}>
             <div className={styles.pickerBarInner}>
               {mode === 'imagine' && (
@@ -239,7 +243,6 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
               )}
               {mode === 'product' && <ProductPickers createButton={pickerSendButton} />}
               {mode === 'character' && <CharacterPickers createButton={pickerSendButton} />}
-              {mode === 'create' && <CreatePickers createButton={pickerSendButton} />}
               {mode === 'assistant' && <AssistantPickers createButton={pickerSendButton} />}
             </div>
           </div>
@@ -414,67 +417,6 @@ function CharacterPickers({ createButton }: { createButton: React.ReactNode }) {
             type="create"
             size="sm"
           />
-        </div>
-      </div>
-      <div className={styles.createButtonWrap}>{createButton}</div>
-    </div>
-  );
-}
-
-/* ── Create (Market Adaption) Pickers ──────────────────────────────── */
-
-function CreatePickers({ createButton }: { createButton: React.ReactNode }) {
-  const { state, dispatch } = useChat();
-
-  // #region agent log
-  fetch('http://127.0.0.1:7500/ingest/fff7b8ab-4ff1-480e-8430-c9ee6c72aac9', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Debug-Session-Id': 'fb1b2f',
-    },
-    body: JSON.stringify({
-      sessionId: 'fb1b2f',
-      runId: 'pre-verify',
-      hypothesisId: 'H1',
-      location: 'ChatInput.tsx:CreatePickers',
-      message: 'MOCK_AD_TEMPLATES binding after import',
-      data: {
-        len: MOCK_AD_TEMPLATES.length,
-        firstId: MOCK_AD_TEMPLATES[0]?.id ?? null,
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-
-  const isValidCreateFormat = IMAGE_FORMATS_IMAGE_CREATION.some(
-    (f) => f.aspectRatio === state.imagineOptions.aspectRatio
-  );
-  const displayValue = isValidCreateFormat
-    ? state.imagineOptions.aspectRatio
-    : DEFAULT_FORMAT_IMAGE_CREATION.id;
-
-  return (
-    <div className={styles.pickerRow}>
-      <div className={styles.pickerRowLeft}>
-        <div className={styles.formatSelectWrapInline}>
-          <AspectRatioSelector
-            value={displayValue}
-            onChange={(format) =>
-              dispatch({
-                type: 'SET_IMAGINE_OPTIONS',
-                payload: {
-                  aspectRatio: format.aspectRatio as '16:9' | '1:1' | '4:5',
-                },
-              })
-            }
-            type="create"
-            size="sm"
-          />
-        </div>
-        <div className={styles.styleSelectWrap}>
-          <MarketsMultiSelect />
         </div>
       </div>
       <div className={styles.createButtonWrap}>{createButton}</div>

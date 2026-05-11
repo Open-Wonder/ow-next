@@ -108,7 +108,7 @@
   height: 100%;
   padding: 0 14px;
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   background: transparent;
   cursor: pointer;
   font-family: var(--font-family-default);
@@ -128,29 +128,29 @@
 .promptModeTabIndicator {
   position: absolute;
   inset: 0;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
 }
 
 /* Active pill: ~10 % tint of the tab foreground color (must mirror .promptModeTabActive*) */
 .promptModeTab:has(.promptModeTabActiveImagine) .promptModeTabIndicator {
-  background: color-mix(in srgb, #3730a3 10%, transparent);
+  background: color-mix(in srgb, #7c3aed 10%, transparent);
 }
 
 .promptModeTab:has(.promptModeTabActiveCreate) .promptModeTabIndicator {
-  background: color-mix(in srgb, #0f766e 10%, transparent);
+  background: color-mix(in srgb, #4f46e5 10%, transparent);
 }
 
 .promptModeTab:has(.promptModeTabActiveProduct) .promptModeTabIndicator {
-  background: color-mix(in srgb, #9a3412 10%, transparent);
+  background: color-mix(in srgb, #16a34a 10%, transparent);
 }
 
 .promptModeTab:has(.promptModeTabActiveCharacter) .promptModeTabIndicator {
-  background: color-mix(in srgb, #a21caf 10%, transparent);
+  background: #fff4c1;
 }
 
 .promptModeTab:has(.promptModeTabActiveAssistant) .promptModeTabIndicator {
-  background: color-mix(in srgb, #1d4ed8 10%, transparent);
+  background: color-mix(in srgb, #db2777 10%, transparent);
 }
 
 .promptModeTabInner {
@@ -167,23 +167,23 @@
 
 /* Active tab: mode-specific foreground (contrast on white pill ≥ WCAG AA for body text) */
 .promptModeTabActiveImagine {
-  color: #3730a3;
+  color: #7c3aed;
 }
 
 .promptModeTabActiveCreate {
-  color: #0f766e;
+  color: #4f46e5;
 }
 
 .promptModeTabActiveProduct {
-  color: #9a3412;
+  color: #16a34a;
 }
 
 .promptModeTabActiveCharacter {
-  color: #a21caf;
+  color: #a26c00;
 }
 
 .promptModeTabActiveAssistant {
-  color: #1d4ed8;
+  color: #db2777;
 }
 
 .promptModeTabIcon {
@@ -198,14 +198,6 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
-}
-
-.promptModeTabActiveImagine .promptModeTabLabel,
-.promptModeTabActiveCreate .promptModeTabLabel,
-.promptModeTabActiveProduct .promptModeTabLabel,
-.promptModeTabActiveCharacter .promptModeTabLabel,
-.promptModeTabActiveAssistant .promptModeTabLabel {
-  font-weight: var(--font-weight-semibold);
 }
 
 /* ── Input Area (tags + textarea) ──────────────────────────────── */

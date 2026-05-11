@@ -5,30 +5,32 @@
   align-items: stretch;
   align-self: stretch;
   gap: 8px;
-  min-height: var(--chat-input-control-min-height, calc(36px * 1.4));
-  padding: var(--spacing-sm);
+  min-height: calc(68px * 1.4 - var(--spacing-sm) * 2);
+  padding: 0;
   min-width: 0;
   box-sizing: border-box;
 }
 
 .fieldShellEmpty {
   justify-content: center;
+  align-items: center;
+  /* In empty state, expand the field to match the visual height of other modes
+     (their inputArea 95.2px + pickerBar 80px). Create mode has no picker bar,
+     so we bake the extra 80px into the field itself and centre the hint vertically. */
+  min-height: calc(68px * 1.4 + 80px - var(--spacing-sm) * 2);
 }
 
 .emptyHint {
-  flex: 1;
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 100%;
-  min-width: 0;
   font-family: var(--font-family-default);
   font-size: 16px;
   line-height: var(--line-height-normal);
   text-align: left;
-  color: var(--color-gray-600);
+  color: var(--color-black);
   background: transparent;
   border: none;
   outline: none;
@@ -47,7 +49,7 @@
   flex-shrink: 0;
   width: 20px;
   height: 20px;
-  color: var(--color-gray-500);
+  color: var(--color-black);
   transition: color var(--transition-fast);
 }
 
@@ -117,7 +119,17 @@
   color: var(--color-white);
   cursor: pointer;
   padding: 0;
-  transition: background var(--transition-fast);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    background var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+.thumbWrap:hover .thumbRemove,
+.thumbRemove:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .thumbRemove:hover {
@@ -179,13 +191,205 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  width: min(960px, 100%);
+  width: min(1200px, 100%);
   max-height: min(85vh, 880px);
   background: var(--color-white);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-gray-200);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18);
   overflow: hidden;
+}
+
+.splitBody {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.leftPane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.rightPane {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--spacing-md);
+  gap: var(--spacing-sm);
+  overflow-y: auto;
+}
+
+.divider {
+  width: 1px;
+  background: var(--color-gray-200);
+  flex-shrink: 0;
+}
+
+.styleFilterRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-gray-100);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+
+.styleFilterRow::-webkit-scrollbar {
+  display: none;
+}
+
+.styleFilterChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-600);
+  background: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.styleFilterChip:hover {
+  background: var(--color-gray-100);
+  color: var(--color-black);
+}
+
+.styleFilterChipActive,
+.styleFilterChipActive:hover {
+  background: var(--color-black);
+  color: var(--color-white);
+  border-color: var(--color-black);
+}
+
+.emptyGrid {
+  padding: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  text-align: center;
+}
+
+.rightPaneHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rightPaneTitle {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-black);
+}
+
+.rightPaneHint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.marketList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.marketRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-gray-200);
+  background: var(--color-white);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.marketRow:hover {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-300);
+}
+
+.marketRowSelected,
+.marketRowSelected:hover {
+  border-color: var(--color-purplish-blue);
+  background: color-mix(in srgb, var(--color-purplish-blue) 6%, var(--color-white));
+}
+
+.marketCheckbox {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--color-purplish-blue);
+  cursor: pointer;
+}
+
+.marketLabel {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-black);
+  user-select: none;
+}
+
+.marketPreviewCard {
+  position: fixed;
+  transform: translate(-100%, -50%);
+  width: 240px;
+  padding: 8px;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.marketPreviewImages {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.marketPreviewImage {
+  width: 72px;
+  height: 54px;
+  border-radius: var(--radius-xs);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.marketPreviewName {
+  font-weight: var(--font-weight-semibold);
+  font-size: 13px;
+  color: var(--color-black);
+}
+
+.marketPreviewDescription {
+  font-size: 12px;
+  color: var(--color-gray-500);
+  line-height: 1.4;
+  margin-top: 2px;
 }
 
 .header {
@@ -237,13 +441,13 @@
 }
 
 .masonry {
-  columns: 4;
+  columns: 3;
   column-gap: 8px;
 }
 
 @media (max-width: 900px) {
   .masonry {
-    columns: 3;
+    columns: 2;
   }
 }
 

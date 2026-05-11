@@ -140,7 +140,10 @@ export default function ChatLanding() {
 
   const hasMessages = state.currentSession && state.currentSession.messages.length > 0;
   const hasImageSessionView =
-    (state.mode === 'imagine' || state.mode === 'product' || state.mode === 'character') &&
+    (state.mode === 'imagine' ||
+      state.mode === 'product' ||
+      state.mode === 'character' ||
+      state.mode === 'create') &&
     state.currentSession &&
     (state.currentSession.messages.length > 0 || state.currentSession.generatedAssets.length > 0);
   const assets = state.currentSession?.generatedAssets ?? [];
@@ -175,12 +178,12 @@ export default function ChatLanding() {
       dispatch({ type: 'SET_MODE', payload: effectiveMode });
     }
 
-    // Imagine mode requires a brand style; product mode requires a shot style; character mode requires a location
+    // Imagine mode requires a brand style; product mode requires a shot style; character mode requires a location.
+    // (Create mode is validated upstream — overlay Send button + chat-input send button — and may dispatch
+    //  SET_CREATE_OPTIONS in the same handler, so closure state would be stale here.)
     if (effectiveMode === 'imagine' && !state.imagineOptions.brandStyle) return false;
     if (effectiveMode === 'product' && !state.productOptions.shotStyle) return false;
     if (effectiveMode === 'character' && !state.characterOptions.location) return false;
-    if (effectiveMode === 'create' && state.createOptions.markets.length === 0) return false;
-    if (effectiveMode === 'create' && state.createOptions.sourceAssetIds.length === 0) return false;
 
     const msg = {
       id: `msg-${Date.now()}`,
@@ -213,6 +216,15 @@ export default function ChatLanding() {
           type: 'SET_GENERATING_IMAGES',
           payload: { active: true, sessionId: generationSessionId },
         });
+        // Tag assets with the source product / character so the Library sidebar can group them.
+        const tagProductId =
+          effectiveMode === 'product'
+            ? state.productOptions.selectedProducts[0]?.id
+            : undefined;
+        const tagCharacterId =
+          effectiveMode === 'character'
+            ? state.characterOptions.selectedCharacters[0]?.id
+            : undefined;
         /* Staggered mock arrivals: short enough to validate full-viewport loader + grid placeholder */
         const delays = [2800, 3300, 3800, 4300];
         delays.forEach((delay, i) => {
@@ -227,6 +239,9 @@ export default function ChatLanding() {
                 type: state.imagineOptions.outputType,
                 aspectRatio: state.imagineOptions.aspectRatio,
                 savedToLibrary: false,
+                createdAt: new Date().toISOString(),
+                ...(tagProductId ? { productId: tagProductId } : {}),
+                ...(tagCharacterId ? { characterId: tagCharacterId } : {}),
               },
               sessionId: generationSessionId,
             });
