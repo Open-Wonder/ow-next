@@ -80,7 +80,7 @@
   box-sizing: border-box;
   width: fit-content;
   max-width: 100%;
-  align-self: center;
+  align-self: flex-start;
   height: 40px;
   flex-shrink: 0;
   padding: 4px;
@@ -208,6 +208,19 @@
   padding: var(--spacing-sm);
   min-height: calc(68px * 1.4);
   flex-shrink: 0;
+}
+
+/* Mode tabs: bleed separator to prompt card left/right (cancel .inputArea horizontal padding) */
+.modeTabsInPrompt {
+  display: flex;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  margin-left: calc(-1 * var(--spacing-sm));
+  margin-right: calc(-1 * var(--spacing-sm));
+  padding-left: var(--spacing-sm);
+  padding-right: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid rgba(230, 230, 230, 1);
 }
 
 .tagsRow {
@@ -343,7 +356,7 @@
   background: transparent;
   outline: none;
   line-height: var(--line-height-normal);
-  padding: var(--spacing-sm);
+  padding: var(--spacing-sm) 16px;
   min-height: var(--chat-input-control-min-height, calc(36px * 1.4));
 }
 

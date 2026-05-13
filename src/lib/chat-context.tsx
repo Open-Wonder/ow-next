@@ -122,6 +122,8 @@ export interface ChatState {
   createOptions: CreateOptions;
   /** When set, EditCanvas opens modify popover for the single asset with this prompt (from library Modify). */
   pendingModifyPrompt: string | null;
+  /** Landing intro chips: inject full prompt into ChatInput PromptEditor, then cleared by ChatInput. */
+  pendingPromptDraft: string | null;
   /** Active library collection (style id). Used when activeView is 'library'. */
   activeLibraryCollection: string;
   /** Asset IDs that are liked (in library). */
@@ -171,6 +173,8 @@ type ChatAction =
   | { type: 'EXIT_MODE' }
   | { type: 'OPEN_IMAGINE_FOR_MODIFY'; payload: { asset: GeneratedAsset; modifyPrompt?: string } }
   | { type: 'CLEAR_PENDING_MODIFY' }
+  | { type: 'SET_PROMPT_DRAFT'; payload: string }
+  | { type: 'CLEAR_PROMPT_DRAFT' }
   | { type: 'SET_MANAGE_PANEL'; payload: ManagePanelType }
   | { type: 'SET_MANAGER_MODAL'; payload: ManagerModalType }
   | { type: 'SET_MANAGER_MODAL_FORM_INIT'; payload: ManagerModalFormInit }
@@ -224,6 +228,7 @@ const initialState: ChatState = {
     sourceAssetIds: [],
   },
   pendingModifyPrompt: null,
+  pendingPromptDraft: null,
   activeLibraryCollection: '',
   likedAssetIds: new Set(MOCK_LIBRARY_ASSETS.filter((a) => a.liked).map((a) => a.id)),
   userLibraryCollections: [],
@@ -388,9 +393,14 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
       const newMode = action.payload;
       // When going back to idle, close the canvas too
       if (newMode === 'idle') {
-        return { ...state, mode: 'idle', canvasOpen: false };
+        return {
+          ...state,
+          mode: 'idle',
+          canvasOpen: false,
+          pendingPromptDraft: null,
+        };
       }
-      return { ...state, mode: newMode };
+      return { ...state, mode: newMode, pendingPromptDraft: null };
     }
 
     case 'EXIT_MODE': {
@@ -408,6 +418,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         currentSession: null,
         canvasOpen: false,
         pendingModifyPrompt: null,
+        pendingPromptDraft: null,
         imagineOptions: initialState.imagineOptions,
         productOptions: initialState.productOptions,
         characterOptions: initialState.characterOptions,
@@ -601,6 +612,7 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
         mode: nextMode,
         canvasOpen: false,
         pendingModifyPrompt: null,
+        pendingPromptDraft: null,
         imagineOptions: initialState.imagineOptions,
         productOptions: initialState.productOptions,
         characterOptions: initialState.characterOptions,
@@ -668,6 +680,12 @@ function chatReducer(state: ChatState, action: ChatAction): ChatState {
 
     case 'CLEAR_PENDING_MODIFY':
       return { ...state, pendingModifyPrompt: null };
+
+    case 'SET_PROMPT_DRAFT':
+      return { ...state, pendingPromptDraft: action.payload };
+
+    case 'CLEAR_PROMPT_DRAFT':
+      return { ...state, pendingPromptDraft: null };
 
     case 'SET_MANAGE_PANEL':
       return { ...state, activeManagePanel: action.payload };

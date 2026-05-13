@@ -19,6 +19,7 @@ import { Button } from '@/components/common/Button';
 import CustomSelect from '@/components/common/Select';
 import Box from '@/components/common/Box';
 import PromptEditor, { type PromptEditorRef } from '@/components/chat/ChatInput/PromptEditor';
+import PromptModeTabs from '@/components/chat/ChatInput/PromptModeTabs';
 import CreateModeImageField from '@/components/chat/ChatInput/CreateModeImageField';
 import AspectRatioSelector from '@/components/common/AspectRatioSelector';
 import {
@@ -43,7 +44,7 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const promptEditorRef = useRef<PromptEditorRef>(null);
-  const { state } = useChat();
+  const { state, dispatch } = useChat();
   const mode = state.mode;
   const hasMessages = state.currentSession && state.currentSession.messages.length > 0;
   const hasAssets = state.currentSession && state.currentSession.generatedAssets.length > 0;
@@ -60,6 +61,38 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
   useEffect(() => {
     setMentionMode(mode);
   }, [mode]);
+
+  /** Landing prompt-example chips inject draft via context — apply once PromptEditor ref exists */
+  useEffect(() => {
+    const draft = state.pendingPromptDraft;
+    if (!draft || !usePromptEditorFor) return;
+
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 40;
+
+    const tryApply = () => {
+      if (cancelled) return;
+      const ed = promptEditorRef.current;
+      if (ed) {
+        ed.setContent(draft);
+        ed.focus();
+        dispatch({ type: 'CLEAR_PROMPT_DRAFT' });
+        return;
+      }
+      attempts++;
+      if (attempts >= maxAttempts) {
+        dispatch({ type: 'CLEAR_PROMPT_DRAFT' });
+        return;
+      }
+      requestAnimationFrame(tryApply);
+    };
+
+    tryApply();
+    return () => {
+      cancelled = true;
+    };
+  }, [state.pendingPromptDraft, usePromptEditorFor, dispatch]);
 
   useEffect(() => {
     const el = textareaRef.current;
@@ -195,6 +228,9 @@ export default function ChatInput({ className, onSend }: ChatInputProps) {
     <Box variant="white" noPadding className={cn(styles.wrapper, className)}>
       {/* Input area */}
       <div className={styles.inputArea}>
+          <div className={styles.modeTabsInPrompt}>
+            <PromptModeTabs />
+          </div>
           <div className={styles.textRow}>
             {usePromptEditorFor ? (
               <PromptEditor

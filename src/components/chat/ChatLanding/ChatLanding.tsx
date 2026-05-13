@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CaretLeft } from '@phosphor-icons/react';
 import ChatInput from '@/components/chat/ChatInput/ChatInput';
-import PromptModeTabs from '@/components/chat/ChatInput/PromptModeTabs';
 import { Button } from '@/components/common/Button';
 import ChatMessages from '@/components/chat/ChatMessages/ChatMessages';
 import ChatSessionHistory from '@/components/chat/ChatSessionHistory/ChatSessionHistory';
@@ -315,18 +314,18 @@ export default function ChatLanding() {
               exit={{ opacity: 0 }}
               transition={fadeOut}
             >
+              <div className={styles.landingSpacer} aria-hidden />
               <div className={styles.landingStack}>
                 <motion.div
                   className={styles.landingHero}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -40 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={fadeIn}
                 >
                   <h1 className={styles.greeting}>{headline.greeting}</h1>
                 </motion.div>
                 <div className={styles.landingInputWrap}>
-                  <PromptModeTabs />
                   <ChatInput onSend={handleSend} />
                 </div>
                 <motion.div
@@ -339,6 +338,7 @@ export default function ChatLanding() {
                   <PromptModeIntro />
                 </motion.div>
               </div>
+              <div className={styles.landingSpacer} aria-hidden />
             </motion.div>
           ) : (
             <motion.div

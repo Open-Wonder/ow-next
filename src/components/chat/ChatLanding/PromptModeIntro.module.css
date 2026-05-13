@@ -1,80 +1,96 @@
-/* Tab-synced landing intro — aligned with landingInputWrap / chat input */
+/* Landing prompt examples — History-like label + single-row outline chips */
 
-.introShell {
+.examplesShell {
   width: 100%;
   margin-top: var(--spacing-lg);
 }
 
-.introCard {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-lg);
+.examplesCard {
   width: 100%;
-  padding: var(--spacing-md) var(--spacing-lg);
   box-sizing: border-box;
-  background: var(--color-gray-50);
-  border: 1px solid var(--color-gray-100);
-  border-radius: var(--radius-md);
-  min-height: 0;
-}
-
-.introText {
-  flex: 1;
-  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2xs);
+  gap: var(--spacing-xs);
+  /* Eyebrow + chip row band — empty Market Adaption slot matches this height */
+  min-height: calc(
+    var(--spacing-xs) + 0.875rem + var(--spacing-xs) + 12px + (var(--font-size-sm) * 1.5)
+  );
 }
 
-.title {
+/* Match ChatSessionHistory .headerTitle (“Imagine History”, etc.) — left-aligned here */
+.eyebrow {
   margin: 0;
-  font-family: var(--font-family-brand);
-  font-size: var(--font-size-md);
+  padding: var(--spacing-xs) 0 0;
+  font-size: 11px;
   font-weight: var(--font-weight-semibold);
-  color: var(--color-black);
-  line-height: var(--line-height-tight);
+  color: var(--color-gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
 }
 
-.body {
+.chipRow {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chipRow::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  appearance: none;
   margin: 0;
+  flex-shrink: 0;
+  padding: 6px 10px;
+  max-width: min(280px, 42vw);
+  border: 1.5px solid rgba(230, 230, 230, 1);
+  border-radius: var(--radius-full);
+  background: transparent;
+  font-family: inherit;
   font-size: var(--font-size-sm);
   color: var(--color-copy-secondary);
   line-height: var(--line-height-normal);
-  max-width: 52ch;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
-.introVisual {
-  flex-shrink: 0;
-  width: 132px;
-  height: 88px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  border: 1px solid var(--color-gray-200);
-  background: var(--color-white);
+.chip:hover {
+  border-color: var(--color-gray-400);
+  color: var(--color-black);
 }
 
-.thumb {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.chip:focus-visible {
+  outline: 2px solid var(--color-black);
+  outline-offset: 2px;
+}
+
+.chipLabel {
   display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 @media screen and (max-width: 640px) {
-  .introCard {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--spacing-md);
-  }
-
-  .introVisual {
-    width: 100%;
-    height: 120px;
-  }
-
-  .body {
-    max-width: none;
+  .chip {
+    max-width: min(220px, 72vw);
   }
 }
