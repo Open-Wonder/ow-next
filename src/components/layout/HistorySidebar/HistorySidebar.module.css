@@ -1,5 +1,5 @@
 .sidebar {
-  width: 280px;
+  width: var(--shell-sidebar-width, 280px);
   height: 100vh;
   flex-shrink: 0;
   border-right: var(--border-default);

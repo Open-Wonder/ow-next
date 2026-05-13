@@ -1,4 +1,5 @@
 .shell {
+  --shell-sidebar-width: 280px;
   display: flex;
   flex-direction: row;
   height: 100vh;
@@ -16,6 +17,7 @@
 .main {
   display: flex;
   flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -31,6 +33,7 @@
 
 .createView {
   flex: 1;
+  min-height: 0;
   display: flex;
   overflow: hidden;
 }
@@ -38,17 +41,20 @@
 .fullLayout {
   display: flex;
   flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
 .splitLayout {
   display: flex;
   flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
 .chatPanelFull {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
